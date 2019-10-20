@@ -7,14 +7,6 @@ def printTable(tab):
     for row in temp:
         pprint(row)
 
-word = 'bcbc'
-modified = True # Determines whether rules table was modified
-
-reader = RuleReader("rules.txt")
-rules = reader.contentToPairs()
-# Context free grammar
-table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
-
 def findRule(rightSide):
     result = ''
     global modified
@@ -23,12 +15,6 @@ def findRule(rightSide):
             result = result + leftSide
     
     return(result)
-
-for i in range(word.__len__()):
-    for lSide in rules:
-        if word[i] in rules[lSide]:
-            table[i][i] = table[i][i] + lSide
-
 
 def findPairForRule(row, column, nTerminal):
     global modified
@@ -47,8 +33,19 @@ def findPairForRule(row, column, nTerminal):
                     table[row][col] = table[row][col] + character
                     modified = True
 
+word = 'bcbc'
+modified = True # Determines whether rules table was modified
 
-            
+reader = RuleReader("rules.txt")
+rules = reader.contentToPairs()
+# Context free grammar
+table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
+
+for i in range(word.__len__()):
+    for lSide in rules:
+        if word[i] in rules[lSide]:
+            table[i][i] = table[i][i] + lSide
+
 
 while modified:
     modified = False
@@ -66,7 +63,7 @@ while modified:
 
 printTable(table)
 if table[0][word.__len__()-1].find('S') >= 0:
-    print("NICE")
+    print('Success')
 else:
-    print("NOPE")
+    print("Failed")
 
