@@ -1,5 +1,6 @@
 from ruleReader import RuleReader
 from pprint import pprint
+import sys
 
 def printTable(tab):
     temp = table.copy()
@@ -33,7 +34,7 @@ def findPairForRule(row, column, nTerminal):
                     table[row][col] = table[row][col] + character
                     modified = True
 
-word = 'bcbc'
+word = sys.argv[1]
 modified = True # Determines whether rules table was modified
 
 reader = RuleReader("rules.txt")
