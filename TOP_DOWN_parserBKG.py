@@ -9,6 +9,16 @@ rules = reader.contentToPairs()
 table[0][word.__len__()-1] = 'S'
 counter = 1
 
+def printFormatedRow(row):
+    for x in range(1, row[row.__len__()-1]+1):
+        print('|', end='')
+        try:
+            pos = row.index(x)
+            print(row[pos-1], end=''),
+        except ValueError:
+            print(' ',end=''),
+    print('|')
+
 def printTable(tab):
     temp = table.copy()
     temp.reverse()
@@ -65,10 +75,8 @@ for cols in range(word.__len__()-1, 0, -1):
     y = cols
     while(x <= word.__len__()-1 and y <= word.__len__()-1):
         expandCell(x, y)
-        print("[", x, "][", y, "]")
         x += 1
         y += 1
-    print("----------")
 
 # while modified:
 #     modified = False
@@ -91,4 +99,4 @@ else:
     print("Failed")
 
 for i in range(word.__len__()-1, -1, -1):
-    print(table[i][i])
+    printFormatedRow(table[i][i])
