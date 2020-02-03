@@ -4,10 +4,13 @@ from pprint import pprint
 
 reader = RuleReader("rules.txt")
 rules = reader.contentToPairs()
+results = set()
 
 def generateFinal(word):
+    global results
     if(word.islower()):
-        print(word)
+        # print(word)
+        results.add(word)
         return
 
     for letterIndex in range(word.__len__()):
@@ -29,3 +32,4 @@ def generateWords(word, length):
             generateWords(newWord, length)
 
 generateWords("S", 4)
+print(results)
