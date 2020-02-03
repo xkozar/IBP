@@ -42,7 +42,7 @@ def expandCell(row, col):
     global counter
     for value in table[row][col]:    
         for rule in rules[value]:
-            expandNonTerminal(row,col,rule)
+            expandNonTerminal(row,col,rules[value][0])
             counter = counter + 1
 
 def expandNonTerminal(row, col, rule):
