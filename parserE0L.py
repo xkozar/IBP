@@ -7,6 +7,12 @@ def printTable(tab):
     for row in temp:
         pprint(row)
 
+def fillStart(word, table):
+    for i in range(word.__len__()):
+        for lSide in rules:
+            if word[i] in rules[lSide]:
+                table[i][i] = table[i][i] + lSide
+
 def findRule(rightSide):
     result = ''
     global modified
@@ -33,7 +39,10 @@ def findPairForRule(row, column, nTerminal):
                     new_table[row][col] = new_table[row][col] + character
                     modified = True
 
+#word = 'bcbc'
 word = 'bcbc'
+print("WORD: ", word)
+
 modified = True # Determines whether rules table was modified
 
 reader = RuleReader("rules.txt")
@@ -43,10 +52,7 @@ table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
 new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
 
 
-for i in range(word.__len__()):
-    for lSide in rules:
-        if word[i] in rules[lSide]:
-            table[i][i] = table[i][i] + lSide
+fillStart(word, table)
 
 
 while modified:
@@ -60,12 +66,13 @@ while modified:
                     findPairForRule(idr, idc, nonTerminal)
 
     table = new_table.copy()
+    fillStart(word, table)
     new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
     if table[0][word.__len__()-1].find('S') >= 0:
-        print('Success')
         printTable(table)
+        print('Success')
         exit()
         
-    print('end of loop')
+    # print('end of loop')
     
 print("Failed")

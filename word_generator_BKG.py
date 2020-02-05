@@ -6,6 +6,11 @@ reader = RuleReader("rules.txt")
 rules = reader.contentToPairs()
 results = set()
 
+def printResults():
+    global results
+    for x in results:
+        print(x)
+
 def generateFinal(word):
     global results
     if(word.islower()):
@@ -32,4 +37,4 @@ def generateWords(word, length):
             generateWords(newWord, length)
 
 generateWords("S", 4)
-print(results)
+printResults()
