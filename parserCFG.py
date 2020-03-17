@@ -1,14 +1,14 @@
 from ruleReader import RuleReader
 from pprint import pprint
+import sys
 
-class E0LParser:
+class ContextFreeGrammarParser:
 
     def __init__(self, word, rules):
         self.word = word
         self.reader = RuleReader(rules)
         self.rules = self.reader.contentToPairs()
         self.table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
-        self.new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.modified = True # Determines whether rules table was modified
 
     def printTable(self):
@@ -16,12 +16,6 @@ class E0LParser:
         temp.reverse()
         for row in temp:
             pprint(row)
-
-    def fillStart(self, word, table):
-        for i in range(word.__len__()):
-            for lSide in self.rules:
-                if word[i] in self.rules[lSide]:
-                    table[i][i] = table[i][i] + lSide
 
     def findRule(self, rightSide):
         result = ''
@@ -44,12 +38,14 @@ class E0LParser:
                 #     continue
                 for character in result:
                     if self.table[row][col].find(character) < 0:
-                        self.new_table[row][col] = self.new_table[row][col] + character
+                        self.table[row][col] = self.table[row][col] + character
                         self.modified = True
 
     def parse(self):
-
-        self.fillStart(self.word, self.table)
+        for i in range(self.word.__len__()):
+            for lSide in self.rules:
+                if self.word[i] in self.rules[lSide]:
+                    self.table[i][i] = self.table[i][i] + lSide
 
         while self.modified:
             self.modified = False
@@ -61,14 +57,11 @@ class E0LParser:
                         for nonTerminal in tableRules:
                             self.findPairForRule(idr, idc, nonTerminal)
 
-            self.table = self.new_table.copy()
-            self.fillStart(self.word, self.table)
-            self.new_table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
-            if self.table[0][self.word.__len__()-1].find('S') >= 0:
-                self.printTable()
-                print('Success')
-                exit()
-                
-            # print('end of loop')
-            
-        print("Failed")
+            print('end of loop')
+
+        self.printTable()
+        if self.table[0][self.word.__len__()-1].find('S') >= 0:
+            print('Success')
+        else:
+            print("Failed")
+
