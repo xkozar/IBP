@@ -74,3 +74,5 @@ class E0LGenerator:
         self.generateWords(length)
         self.finalizeWords()
         return self.results
+
+print(E0LGenerator("testRules.txt").generate(6))

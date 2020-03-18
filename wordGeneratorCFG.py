@@ -40,4 +40,4 @@ class ContextFreeGrammarGenerator:
         return self.results
 
 # TODO rewrite to iteration
-ContextFreeGrammarGenerator("rules.txt").generate(4)
+# ContextFreeGrammarGenerator("rules.txt").generate(4)

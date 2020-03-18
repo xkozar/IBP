@@ -49,6 +49,8 @@ class ET0LParser:
 
     def CYK_loop(self, CYKtable, ruleTable, firstTime):
         newCYKtable = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+        for diagonal in range(CYKtable.__len__()):
+            newCYKtable[diagonal][diagonal] = CYKtable[diagonal][diagonal]
         # while modified:
         modifiedContainer = [firstTime]
         self.printTable(CYKtable)
@@ -80,3 +82,5 @@ class ET0LParser:
                     return True
             
         return False
+
+# ET0LParser("abcc", "testRulesET0l.txt").parse()

@@ -10,6 +10,7 @@ class E0LParser:
         self.table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.modified = True # Determines whether rules table was modified
+        self.firstStep = True
 
     def printTable(self):
         temp = self.table.copy()
@@ -44,6 +45,9 @@ class E0LParser:
                 #     continue
                 for character in result:
                     if self.table[row][col].find(character) < 0:
+                        if row == column and col == column + 1 and not self.firstStep:
+                            continue
+
                         self.new_table[row][col] = self.new_table[row][col] + character
                         self.modified = True
 
@@ -66,5 +70,6 @@ class E0LParser:
             self.new_table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
             if self.table[0][self.word.__len__()-1].find('S') >= 0:
                 self.printTable()
-                return True                
+                return True
+            self.firstStep = False            
         return False
