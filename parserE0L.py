@@ -8,8 +8,10 @@ class E0LParser:
         self.reader = RuleReader(rules)
         self.rules = self.reader.contentToPairs()
         self.table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
-        self.new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
+        self.newTable = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.modified = True # Determines whether rules table was modified
+        self.firstStep = True
+        self.tableUsedMap = [['' for i in range(word.__len__())] for j in range(word.__len__())]
 
     def printTable(self):
         temp = self.table.copy()
@@ -40,18 +42,47 @@ class E0LParser:
                 continue
             for nTerm in tRules:
                 result = self.findRule(nTerminal + nTerm)
+                
                 # if result == '':
                 #     continue
                 for character in result:
+                    firstIndex = self.findIndexInCell(row, column, nTerminal)
+                    secondIndex = self.findIndexInCell(column+1, col, nTerm)
+                    self.tableUsedMap[row][column] = self.tableUsedMap[row][column][0:firstIndex] + "1" + self.tableUsedMap[row][column][firstIndex+1:self.tableUsedMap[row][column].__len__()]
+                    self.tableUsedMap[column+1][col] = self.tableUsedMap[column+1][col][0:secondIndex] + "1" + self.tableUsedMap[column+1][col][secondIndex+1:self.tableUsedMap[column+1][col].__len__()]
                     if self.table[row][col].find(character) < 0:
-                        self.new_table[row][col] = self.new_table[row][col] + character
+                        if row == column and col == column + 1 and not self.firstStep:
+                            continue
+
+                        self.newTable[row][col] = self.newTable[row][col] + character
                         self.modified = True
+
+    def findIndexInCell(self, row, column, symbol):
+        for id, symb in enumerate(self.table[row][column]):
+            if symb == symbol:
+                return id
+        raise IndexError
+
+    def fillUsedMap(self):
+        for idr, row in enumerate(self.table):
+            for idc, cell in enumerate(row):
+                self.tableUsedMap[idr][idc] = "0" * cell.__len__()
+
+    def fillNewTableWithUnused(self):
+        for idr, row in enumerate(self.tableUsedMap):
+            for idc, cell in enumerate(row):
+                for ids, sym in enumerate(cell):
+                    if sym == "0":
+                        symbol = self.table[idr][idc][ids]
+                        if self.newTable[idr][idc].find(symbol) < 0:
+                            self.newTable[idr][idc] = self.newTable[idr][idc] + symbol
 
     def parse(self):
 
         self.fillStart(self.word, self.table)
 
         while self.modified:
+            self.fillUsedMap()
             self.modified = False
             self.printTable()
             print('-----------------------------------------')
@@ -61,9 +92,10 @@ class E0LParser:
                         for nonTerminal in tableRules:
                             self.findPairForRule(idr, idc, nonTerminal)
 
-            self.table = self.new_table.copy()
+            self.fillNewTableWithUnused()
+            self.table = self.newTable.copy()
             self.fillStart(self.word, self.table)
-            self.new_table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+            self.newTable = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
             if self.table[0][self.word.__len__()-1].find('S') >= 0:
                 self.printTable()
                 print('Success')
