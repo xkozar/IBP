@@ -61,7 +61,7 @@ class ContextFreeGrammarParser:
 
         self.printTable()
         if self.table[0][self.word.__len__()-1].find('S') >= 0:
-            print('Success')
+            return True
         else:
-            print("Failed")
+            return False
 

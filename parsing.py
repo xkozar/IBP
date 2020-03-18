@@ -68,12 +68,21 @@ rulesFile = [item for item in opts if item[0] == rulesForParserFlag][0][1]
 for flag, value in opts:
     if flag == BKGParserFlag:
         print("Using context free grammar parser")
-        ContextFreeGrammarParser(word, rulesFile).parse()
+        if ContextFreeGrammarParser(word, rulesFile).parse():
+            print("Success")
+        else:
+            print("Fail")
     if flag == E0LParserFlag:
         print("Using E0L system parser")
-        E0LParser(word, rulesFile).parse()
+        if E0LParser(word, rulesFile).parse():
+            print("Success")
+        else:
+            print("Fail")
     if flag == ET0LParserFlag:
         print("Using ET0L system parser")
-        ET0LParser(word, rulesFile).parse()
+        if ET0LParser(word, rulesFile).parse():
+            print("Success")
+        else:
+            print("Fail")
 
 

@@ -63,19 +63,20 @@ class ET0LParser:
         # new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         if newCYKtable[0][self.word.__len__()-1].find('S') >= 0:
             self.printTable(newCYKtable)
-            print('Success')
-            exit()
+            return True
             
         print('end of loop')
         if modifiedContainer[0]:
             for rulesTable in self.rules:
-                self.CYK_loop(newCYKtable.copy(), rulesTable, False)
+                if self.CYK_loop(newCYKtable.copy(), rulesTable, False):
+                    return True
 
     def parse(self):
         for rulesTable in self.rules:
             self.table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
             self.set_initial_rules(self.table, rulesTable)
             for rulesTable2 in self.rules:
-                self.CYK_loop(self.table.copy(), rulesTable2, True)
+                if self.CYK_loop(self.table.copy(), rulesTable2, True):
+                    return True
             
-        print("Failed")
+        return False

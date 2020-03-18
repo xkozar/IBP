@@ -66,9 +66,5 @@ class E0LParser:
             self.new_table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
             if self.table[0][self.word.__len__()-1].find('S') >= 0:
                 self.printTable()
-                print('Success')
-                exit()
-                
-            # print('end of loop')
-            
-        print("Failed")
+                return True                
+        return False
