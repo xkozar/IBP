@@ -11,6 +11,7 @@ class E0LParser:
         self.new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.modified = True # Determines whether rules table was modified
         self.firstStep = True
+        self.tableToCopy = [['' for i in range(word.__len__())] for j in range(word.__len__())]
 
     def printTable(self):
         temp = self.table.copy()
@@ -47,12 +48,13 @@ class E0LParser:
                     if self.table[row][col].find(character) < 0:
                         if row == column and col == column + 1 and not self.firstStep:
                             continue
-
+                        
                         self.new_table[row][col] = self.new_table[row][col] + character
                         self.modified = True
 
-    def parse(self):
 
+
+    def parse(self):
         self.fillStart(self.word, self.table)
 
         while self.modified:
@@ -65,11 +67,15 @@ class E0LParser:
                         for nonTerminal in tableRules:
                             self.findPairForRule(idr, idc, nonTerminal)
 
+            if self.firstStep:
+                self.tableToCopy = self.new_table.copy()
+                self.fillStart(self.word, self.tableToCopy)
+
             self.table = self.new_table.copy()
             self.fillStart(self.word, self.table)
-            self.new_table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+            self.new_table = self.tableToCopy
             if self.table[0][self.word.__len__()-1].find('S') >= 0:
                 self.printTable()
                 return True
-            self.firstStep = False            
+            self.firstStep = False
         return False
