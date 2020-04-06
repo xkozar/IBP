@@ -75,4 +75,4 @@ class E0LGenerator:
         self.finalizeWords()
         return self.results
 
-print(E0LGenerator("testRules.txt").generate(6))
+print(E0LGenerator("testRules.txt").generate(4), "Hola")

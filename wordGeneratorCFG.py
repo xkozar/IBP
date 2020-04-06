@@ -7,6 +7,7 @@ class ContextFreeGrammarGenerator:
         self.reader = RuleReader(ruleFile)
         self.rules = self.reader.contentToPairs()
         self.results = set()
+        self.newWordStack = []
 
     def printResults(self):
         for x in self.results:
@@ -26,18 +27,22 @@ class ContextFreeGrammarGenerator:
                         newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
                         self.generateFinal(newWord)
 
-    def generateWords(self, word, length):
-        if(word.__len__() == length):
-            self.generateFinal(word)
-            return
-        for letterIndex in range(word.__len__()):
-            for rule in self.rules.get(word[letterIndex], []):
-                newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
-                self.generateWords(newWord, length)
+    def generateWords(self, w, length):
+        self.newWordStack.append(w)
+
+        while self.newWordStack.__len__() > 0:
+            word = self.newWordStack.pop()
+            if(word.__len__() == length):
+                self.generateFinal(word)
+                continue
+            for letterIndex in range(word.__len__()):
+                for rule in self.rules.get(word[letterIndex], []):
+                    newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
+                    self.newWordStack.append(newWord)
 
     def generate(self, length):
         self.generateWords("S", length)
         return self.results
 
 # TODO rewrite to iteration
-# ContextFreeGrammarGenerator("rules.txt").generate(4)
+print(ContextFreeGrammarGenerator("testRules.txt").generate(4))

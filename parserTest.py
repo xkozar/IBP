@@ -24,13 +24,13 @@ def enablePrint():
 #         print("CFG parser failed on: ", word)
 
 
-E0LWords = E0LGenerator("testRules.txt").generate(5)
+E0LWords = E0LGenerator("testRules.txt").generate(12)
 E0LCounter = 0
 for word in E0LWords:
     blockPrint()
     if E0LParser(word, "testRules.txt").parse():
         enablePrint()
-        print("E0L success")
+        print(word, " -> E0L success")
         E0LCounter = E0LCounter + 1
     else:
         enablePrint()
