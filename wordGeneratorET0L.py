@@ -18,11 +18,17 @@ class ET0LGenerator:
         for x in temp:
             print(x)
 
+    def possibleRuleApplication(self, word, ruleSet):
+        for x in word:
+            if ruleSet.get(x, []) != []:
+                return True
+        return False
+
     def generateFinal(self, w):
+        newWordStack = []
+        finalRuleStack = []
         for x in self.rules:
-            newWordStack = []
             newWordStack.append(w)
-            finalRuleStack = []
             finalRuleStack.append(x)
 
         while newWordStack.__len__() != 0:
@@ -78,14 +84,19 @@ class ET0LGenerator:
             else:
                 for rule in ruleSet.get(word[index], []):
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
-                    for x in self.rules:
+                    if (index + rule.__len__()) % newWord.__len__() == 0:
+                        for x in self.rules:
+                            self.wordStack.append(newWord)
+                            self.indexStack.append((index + rule.__len__()) % newWord.__len__())
+                            self.ruleStack.append(x)
+                    else: 
                         self.wordStack.append(newWord)
                         self.indexStack.append((index + rule.__len__()) % newWord.__len__())
-                        self.ruleStack.append(x)
+                        self.ruleStack.append(ruleSet)
 
     def generate(self, length):
         self.generateWords(length)
         self.finalizeWords()
         return self.results
 
-# print(ET0LGenerator("testRulesET0L.txt").generate(4))
+print(ET0LGenerator("testRulesET0L.txt").generate(4))

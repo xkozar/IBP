@@ -23,32 +23,6 @@ class E0LGenerator:
         for x in temp:
             print(x)
 
-    def generateFinal(self, w, length):
-        newWordStack = []
-        newWordStack.append(w)
-
-        while newWordStack.__len__() != 0:
-            word = newWordStack.pop()
-            if(word.__len__() > length):
-                continue
-            if(word.islower()):
-                self.results.add(word)
-                continue
-
-
-            for letterIndex in range(word.__len__()):
-                if not word[letterIndex].islower():
-                    # print(word[letterIndex], "IS NOT LOWER!!!")
-                    for rule in self.rules.get(word[letterIndex], []):
-                        if rule.islower():
-                            newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
-                            newWordStack.append(newWord)
-
-
-    def finalizeWords(self, length):
-        for x in self.rawResults:
-            self.generateFinal(x, length)
-
     def generateWords(self, length):
         self.wordStack.append("S")
         self.indexStack.append(0)
@@ -63,9 +37,9 @@ class E0LGenerator:
                 continue
             if word.__len__() > length:
                 continue
-            if word.__len__() == length and index == 0:
+            if word.__len__() == length and index == 0 and word.islower():
                 # print("---", word)
-                self.rawResults.add(word)
+                self.results.add(word)
                 continue
 
             if self.rules.get(word[index], []) == []:
@@ -81,9 +55,6 @@ class E0LGenerator:
 
     def generate(self, length):
         self.generateWords(length)
-        self.finalizeWords(length)
         return self.results
 
-    
-
-print(E0LGenerator("debug.txt").generate(4), "Hola")
+print(E0LGenerator("testRules.txt").generate(4), "Hola")
