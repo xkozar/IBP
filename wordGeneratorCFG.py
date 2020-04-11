@@ -9,7 +9,7 @@ class ContextFreeGrammarGenerator:
 
     def __init__(self, ruleFile):
         self.reader = RuleReader(ruleFile)
-        self.rules = self.reader.contentToRules()
+        self.rules = self.reader.getRulesDictionary()
         self.results = set()
         self.newWordStack = []
 
@@ -17,36 +17,24 @@ class ContextFreeGrammarGenerator:
         for x in self.results:
             print(x)
 
-    def generateFinal(self, word):
-        if(word.islower()):
-            # print(word)
-            self.results.add(word)
-            return
-
-        for letterIndex in range(word.__len__()):
-            if not word[letterIndex].islower():
-                # print(word[letterIndex], "IS NOT LOWER!!!")
-                for rule in self.rules.get(word[letterIndex], []):
-                    if rule.islower():
-                        newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
-                        self.generateFinal(newWord)
-
     def generateWords(self, w, length):
         self.newWordStack.append(w)
 
         while self.newWordStack.__len__() > 0:
-            word = self.newWordStack.pop()
-            if(word.__len__() == length):
-                self.generateFinal(word)
+            word = self.newWordStack.pop(0)
+            if(word.__len__() > length):
+                continue
+            if(word.__len__() == length and word.islower()):
+                self.results.add(word)
                 continue
             for letterIndex in range(word.__len__()):
                 for rule in self.rules.get(word[letterIndex], []):
                     newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
-                    self.newWordStack.append(newWord)
+                    if newWord not in self.newWordStack:
+                        self.newWordStack.append(newWord)
 
     def generate(self, length):
         self.generateWords("S", length)
         return self.results
 
-# TODO rewrite to iteration
-print(ContextFreeGrammarGenerator("debug.txt").generate(4))
+print(ContextFreeGrammarGenerator("testRules.txt").generate(10))

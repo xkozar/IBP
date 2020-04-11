@@ -9,7 +9,7 @@ class ET0LGenerator:
 
     def __init__(self, ruleFile):
         self.reader = RuleReader(ruleFile)
-        self.rules = self.reader.contentToRules()
+        self.rules = self.reader.getRulesDictionary()
         self.results = set()
         self.rawResults = set()
         self.wordStack = []
