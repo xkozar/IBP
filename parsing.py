@@ -1,3 +1,7 @@
+# Author:   Tomáš Kožár, xkozar02
+#           Faculty of Information Technology, Brno University of Technology
+# Bachelor's Thesis: Parsing for ET0L systems
+
 import getopt
 import sys
 from parserCFG import ContextFreeGrammarParser
@@ -84,5 +88,3 @@ for flag, value in opts:
             print("Success")
         else:
             print("Fail")
-
-

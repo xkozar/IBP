@@ -1,3 +1,7 @@
+# Author:   Tomáš Kožár, xkozar02
+#           Faculty of Information Technology, Brno University of Technology
+# Bachelor's Thesis: Parsing for ET0L systems
+
 from ruleReader import RuleReader
 from pprint import pprint
 
@@ -6,7 +10,7 @@ class E0LParser:
     def __init__(self, word, rules):
         self.word = word
         self.reader = RuleReader(rules)
-        self.rules = self.reader.contentToPairs()
+        self.rules = self.reader.contentToRules(True)
         self.table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         self.modified = True # Determines whether rules table was modified

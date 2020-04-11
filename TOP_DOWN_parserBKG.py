@@ -1,3 +1,7 @@
+# Author:   Tomáš Kožár, xkozar02
+#           Faculty of Information Technology, Brno University of Technology
+# Bachelor's Thesis: Parsing for ET0L systems
+
 from ruleReader import RuleReader
 from pprint import pprint
 
@@ -5,7 +9,7 @@ word = 'bcbcc'
 table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
 modified = True # Determines whether rules table was modified
 reader = RuleReader("rules.txt")
-rules = reader.contentToPairs()
+rules = reader.contentToRules()
 table[0][word.__len__()-1] = 'S'
 
 def printTable(tab):

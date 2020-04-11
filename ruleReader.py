@@ -1,4 +1,8 @@
-import re
+# Author:   Tomáš Kožár, xkozar02
+#           Faculty of Information Technology, Brno University of Technology
+# Bachelor's Thesis: Parsing for ET0L systems
+
+import re, os, sys
 
 class RuleReader:
     
@@ -13,21 +17,26 @@ class RuleReader:
         with open(self.filename, 'r') as file:
             self.content = file.read()
 
-    def contentToPairs(self):
-        # TODO use regex to check if rule is in proper format!!!
+    def contentToRules(self, chomskyNormalFormRules):
         for line in self.content.split('\n'):
-            # Remove empty spaces from file
+            # Remove all whitespace from line
+            line = "".join(line.split())
             if line == '':
                 continue
 
+            ruleInCNF = re.match("[A-Z]->([A-Z][A-Z]|[a-z])", line)
+            if chomskyNormalFormRules and not ruleInCNF:
+                print("Rules need to be in Chomsky normal form", file=sys.stderr)
+                print(line, file=sys.stderr)
+                raise RuntimeError()
+
             # Remove whitespace and split
-            rulePair = ''.join(line.split()).split('->')
+            rulePair = line.split('->')
             if rulePair[0] in self.rulesDictionary:
                 self.rulesDictionary[rulePair[0]].append(rulePair[1])
             else:
                 self.rulesDictionary[rulePair[0]] = [rulePair[1]]
         return self.rulesDictionary   
 
-    def getRulesDictionary(self):
-        return 0
-        
+    def getRulesDictionary(self, chomskyNormalFormRules=False):
+        return self.contentToRules(chomskyNormalFormRules)

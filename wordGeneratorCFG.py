@@ -1,3 +1,7 @@
+# Author:   Tomáš Kožár, xkozar02
+#           Faculty of Information Technology, Brno University of Technology
+# Bachelor's Thesis: Parsing for ET0L systems
+
 from ruleReader import RuleReader
 from pprint import pprint
 
@@ -5,7 +9,7 @@ class ContextFreeGrammarGenerator:
 
     def __init__(self, ruleFile):
         self.reader = RuleReader(ruleFile)
-        self.rules = self.reader.contentToPairs()
+        self.rules = self.reader.contentToRules()
         self.results = set()
         self.newWordStack = []
 
@@ -45,4 +49,4 @@ class ContextFreeGrammarGenerator:
         return self.results
 
 # TODO rewrite to iteration
-print(ContextFreeGrammarGenerator("testRules.txt").generate(4))
+print(ContextFreeGrammarGenerator("debug.txt").generate(4))
