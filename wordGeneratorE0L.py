@@ -61,4 +61,4 @@ class E0LGenerator:
         self.generateWords(length)
         return self.results
 
-print(E0LGenerator("testRules.txt").generate(4), "Hola")
+# print(E0LGenerator("testRules.txt").generate(40))

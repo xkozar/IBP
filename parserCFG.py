@@ -23,15 +23,20 @@ class ContextFreeGrammarParser:
         for col in zip(*temp):
             sizeTemplate.append(max(col, key=len).__len__())
 
-        for row in temp:
+        for x, row in enumerate(temp):
             rowToPrint = ""
-            print("[", end="")
+            rowToPrint += "["
             for y, value in enumerate(row):
                 if y != 0 and y != row.__len__():
-                    print("|", end="")
+                    rowToPrint += "|"
                 spacePadding = (sizeTemplate[y] - value.__len__()) * " "
-                print(" " + value + spacePadding + " ", end="")
-            print("]")
+                rowToPrint += " " + value + spacePadding + " "
+            rowToPrint += "]"
+            if x == 0:
+                print()
+            print(rowToPrint)
+            if x == row.__len__() - 1:
+                print(rowToPrint.__len__() * "_")
 
     def findRule(self, rightSide):
         result = ''
@@ -66,16 +71,14 @@ class ContextFreeGrammarParser:
         while self.modified:
             self.modified = False
             self.printTable()
-            print('-----------------------------------------')
             for idr, row in enumerate(self.table):
                 for idc, tableRules in enumerate(row):
                     if(tableRules is not ''):
                         for nonTerminal in tableRules:
                             self.findPairForRule(idr, idc, nonTerminal)
 
-            print('end of loop')
 
-        self.printTable()
+        # self.printTable()
         if self.table[0][self.word.__len__()-1].find('S') >= 0:
             return True
         else:

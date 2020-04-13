@@ -25,8 +25,13 @@ class RuleReader:
                 continue
 
             ruleInCNF = re.match("[A-Z]->([A-Z][A-Z]|[a-z])", line)
+            ruleInRightFormat = re.match("[A-z]->[A-z]+", line)
             if chomskyNormalFormRules and not ruleInCNF:
                 print("Rules need to be in Chomsky normal form", file=sys.stderr)
+                print(line, file=sys.stderr)
+                raise RuntimeError()
+            elif not ruleInRightFormat:
+                print("Rules need to be proper format", file=sys.stderr)
                 print(line, file=sys.stderr)
                 raise RuntimeError()
 

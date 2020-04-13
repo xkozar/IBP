@@ -19,8 +19,25 @@ class ET0LParser:
     def printTable(self, tab):
         temp = tab.copy()
         temp.reverse()
-        for row in temp:
-            pprint(row)
+        
+        sizeTemplate = []
+        for col in zip(*temp):
+            sizeTemplate.append(max(col, key=len).__len__())
+
+        for x, row in enumerate(temp):
+            rowToPrint = ""
+            rowToPrint += "["
+            for y, value in enumerate(row):
+                if y != 0 and y != row.__len__():
+                    rowToPrint += "|"
+                spacePadding = (sizeTemplate[y] - value.__len__()) * " "
+                rowToPrint += " " + value + spacePadding + " "
+            rowToPrint += "]"
+            if x == 0:
+                print()
+            print(rowToPrint)
+            if x == row.__len__() - 1:
+                print(rowToPrint.__len__() * "_")
 
     def findRule(self, rightSide, rules):
         result = ''
@@ -29,7 +46,7 @@ class ET0LParser:
                 result = result + leftSide
         return(result)
 
-    def findPairForRule(self, row, column, nTerminal, rules, CYKtable, newCYKtable, modifiedContainer):
+    def findPairForRule(self, row, column, nTerminal, rules, CYKtable, newCYKtable, modifiedContainer, firstStep):
         if column == self.word.__len__()-1:
             return
 
@@ -42,6 +59,8 @@ class ET0LParser:
                 #     continue
                 for character in result:
                     if CYKtable[row][col].find(character) < 0:
+                        if row == column and col == column + 1 and not firstStep:
+                            continue
                         newCYKtable[row][col] = newCYKtable[row][col] + character
                         modifiedContainer[0] = True
 
@@ -51,40 +70,43 @@ class ET0LParser:
                 if self.word[i] in rules[lSide]:
                     table[i][i] = table[i][i] + lSide
 
-    def CYK_loop(self, CYKtable, ruleTable, firstTime):
-        newCYKtable = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+    def CYK_loop(self, CYKtable, ruleTable, firstTime, firstStep, toCopyTable):
+        newCYKtable = toCopyTable.copy()
         for diagonal in range(CYKtable.__len__()):
             newCYKtable[diagonal][diagonal] = CYKtable[diagonal][diagonal]
         # while modified:
         modifiedContainer = [firstTime]
         self.printTable(CYKtable)
-        print('-----------------------------------------')
         for idr, row in enumerate(CYKtable):
             for idc, tableRules in enumerate(row):
                 if(tableRules is not ''):
                     for nonTerminal in tableRules:
-                        self.findPairForRule(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer)
+                        self.findPairForRule(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, firstStep)
 
+        if firstStep:
+            tableToCopy = newCYKtable.copy()
+        else:
+            tableToCopy = toCopyTable
         # table = new_table.copy()
         # new_table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
         if newCYKtable[0][self.word.__len__()-1].find('S') >= 0:
             self.printTable(newCYKtable)
             return True
             
-        print('end of loop')
         if modifiedContainer[0]:
             for rulesTable in self.rules:
-                if self.CYK_loop(newCYKtable.copy(), rulesTable, False):
+                if self.CYK_loop(newCYKtable.copy(), rulesTable, False, False, tableToCopy):
                     return True
 
     def parse(self):
         for rulesTable in self.rules:
             self.table = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
             self.set_initial_rules(self.table, rulesTable)
+            newTable = [['' for i in range(self.word.__len__())] for j in range(self.word.__len__())]
             for rulesTable2 in self.rules:
-                if self.CYK_loop(self.table.copy(), rulesTable2, True):
+                if self.CYK_loop(self.table.copy(), rulesTable2, True, True, newTable):
                     return True
             
         return False
 
-# ET0LParser("abcc", "testRulesET0l.txt").parse()
+# print(ET0LParser("bccb", "testRulesET0L.txt").parse())

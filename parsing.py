@@ -17,7 +17,7 @@ def printHelp():
     print("-T -> use parser for ET0L system")
     print("Exactly 1 command above have to be used.")
     print("-w <word> -> specifies word to be parsed !MANDATORY!")
-    print("-R <rules> -> specifies file with rules for parser !MANDATORY!")
+    print("-r <rules> -> specifies file with rules for parser !MANDATORY!")
     print("")
     print("Rules are in format: '[A-Z] -> [A-Z][A-Z]' or '[A-Z] -> [a-z]'")
     print("Each rule needs to be on separate line!")
@@ -26,14 +26,14 @@ def printHelp():
 
 helpFlag = "-h"
 
-BKGParserFlag = "-C"
+CFGParserFlag = "-C"
 E0LParserFlag = "-E"
 ET0LParserFlag = "-T"
 
 wordToParseFlag = "-w"
 rulesForParserFlag = "-r"
 
-parserOptions = [BKGParserFlag, E0LParserFlag, ET0LParserFlag]
+parserOptions = [CFGParserFlag, E0LParserFlag, ET0LParserFlag]
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "CETr:w:h")
@@ -70,7 +70,7 @@ rulesFile = [item for item in opts if item[0] == rulesForParserFlag][0][1]
 
 # Run specified parser
 for flag, value in opts:
-    if flag == BKGParserFlag:
+    if flag == CFGParserFlag:
         print("Using context free grammar parser")
         if ContextFreeGrammarParser(word, rulesFile).parse():
             print("Success")

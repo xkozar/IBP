@@ -20,8 +20,25 @@ class E0LParser:
     def printTable(self):
         temp = self.table.copy()
         temp.reverse()
-        for row in temp:
-            pprint(row)
+        
+        sizeTemplate = []
+        for col in zip(*temp):
+            sizeTemplate.append(max(col, key=len).__len__())
+
+        for x, row in enumerate(temp):
+            rowToPrint = ""
+            rowToPrint += "["
+            for y, value in enumerate(row):
+                if y != 0 and y != row.__len__():
+                    rowToPrint += "|"
+                spacePadding = (sizeTemplate[y] - value.__len__()) * " "
+                rowToPrint += " " + value + spacePadding + " "
+            rowToPrint += "]"
+            if x == 0:
+                print()
+            print(rowToPrint)
+            if x == row.__len__() - 1:
+                print(rowToPrint.__len__() * "_")
 
     def fillStart(self, word, table):
         for i in range(word.__len__()):
@@ -64,7 +81,6 @@ class E0LParser:
         while self.modified:
             self.modified = False
             self.printTable()
-            print('-----------------------------------------')
             for idr, row in enumerate(self.table):
                 for idc, tableRules in enumerate(row):
                     if(tableRules is not ''):
