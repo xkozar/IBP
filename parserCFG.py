@@ -18,8 +18,20 @@ class ContextFreeGrammarParser:
     def printTable(self):
         temp = self.table.copy()
         temp.reverse()
+        
+        sizeTemplate = []
+        for col in zip(*temp):
+            sizeTemplate.append(max(col, key=len).__len__())
+
         for row in temp:
-            pprint(row)
+            rowToPrint = ""
+            print("[", end="")
+            for y, value in enumerate(row):
+                if y != 0 and y != row.__len__():
+                    print("|", end="")
+                spacePadding = (sizeTemplate[y] - value.__len__()) * " "
+                print(" " + value + spacePadding + " ", end="")
+            print("]")
 
     def findRule(self, rightSide):
         result = ''
