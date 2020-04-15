@@ -24,16 +24,16 @@ class RuleReader:
             if line == '':
                 continue
 
-            ruleInCNF = re.match("[A-Z]->([A-Z][A-Z]|[a-z])", line)
+            ruleInCNF = re.match("([A-Z]->([A-Z]{1,2}|[a-z]))|[a-z]->[A-Z]", line)
             ruleInRightFormat = re.match("[A-z]->[A-z]+", line)
-            if chomskyNormalFormRules and not ruleInCNF:
-                print("Rules need to be in Chomsky normal form", file=sys.stderr)
-                print(line, file=sys.stderr)
-                raise RuntimeError()
-            elif not ruleInRightFormat:
-                print("Rules need to be proper format", file=sys.stderr)
-                print(line, file=sys.stderr)
-                raise RuntimeError()
+            # if chomskyNormalFormRules and not ruleInCNF:
+            #     print("Rules need to be in Chomsky normal form", file=sys.stderr)
+            #     print(line, file=sys.stderr)
+            #     raise RuntimeError()
+            # elif not ruleInRightFormat:
+            #     print("Rules need to be proper format", file=sys.stderr)
+            #     print(line, file=sys.stderr)
+            #     raise RuntimeError()
 
             # Remove whitespace and split
             rulePair = line.split('->')

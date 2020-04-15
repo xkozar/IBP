@@ -103,4 +103,4 @@ class ET0LGenerator:
         self.finalizeWords()
         return self.results
 
-print(ET0LGenerator("testRulesET0L.txt").generate(4))
+# print(ET0LGenerator("testRulesET0L.txt").generate(4))

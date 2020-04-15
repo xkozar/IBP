@@ -37,4 +37,4 @@ class ContextFreeGrammarGenerator:
         self.generateWords("S", length)
         return self.results
 
-print(ContextFreeGrammarGenerator("testRules.txt").generate(4))
+# print(ContextFreeGrammarGenerator("testRules.txt").generate(4))
