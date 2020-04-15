@@ -65,17 +65,14 @@ class E0LParser:
                 print(rowToPrint.__len__() * "_")
 
     def fillStart(self, word, table):
-        for i in range(word.__len__()):
-            for lSide in self.rules:
-                if word[i] in self.rules[lSide]:
-                    table[i][i].add(lSide)
+        for diag, character in enumerate(self.word):
+            table[diag][diag] = self.findRule(character)
 
     def findRule(self, rightSide):
         result = set()
         for leftSide in self.rules:
             if rightSide in self.rules[leftSide]:
                 result.add(leftSide)
-        
         return result
 
     def reduceRules(self, row, column, nTerminal):
