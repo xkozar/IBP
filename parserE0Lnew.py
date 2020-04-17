@@ -20,7 +20,30 @@ class E0LParser:
         self.fillEmptyRules()
 
     def fillEmptyRules(self):
-        self.emptyRules = self.findRule("-")
+        tempEmptyRules = self.findRule("-")
+        emptyChanged = True
+
+        while emptyChanged:
+            emptyChanged = False
+            updateEmptySet = set()
+            for empty in tempEmptyRules:
+                newEmpty = self.findRule(empty)
+                if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                    emptyChanged = True
+                    updateEmptySet.update(newEmpty)
+            tempEmptyRules.update(updateEmptySet)
+
+            for empty1 in tempEmptyRules:
+                for empty2 in tempEmptyRules:
+                    newEmpty = self.findRule(empty1 + empty2)
+                    if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                        emptyChanged = True
+                        updateEmptySet.update(newEmpty)
+            tempEmptyRules.update(updateEmptySet)
+
+            self.emptyRules.update(tempEmptyRules)
+
+        print(self.emptyRules)
 
     def compareTables(self, tab1, tab2):
         for row1, row2 in zip(tab1, tab2):
@@ -75,18 +98,38 @@ class E0LParser:
                 result.add(leftSide)
         return result
 
+    def findPartialRule(self, rightSide):
+        result = set()
+        for leftSide in self.rules:
+            for rule in self.rules[leftSide]:
+                if rightSide in rule and rule.__len__() ==  2:
+                    result.add(leftSide)
+        return result
+
     def reduceRules(self, row, column, nTerminal):
         if nTerminal == "":
             return
         unaryRuleFound = self.findRule(nTerminal)
-        if unaryRuleFound.__len__() > 0:
-            self.modified = True
-            self.new_table[row][column].update(unaryRuleFound)
+
+        
+        for unaryRule in unaryRuleFound:
+            if nTerminal in self.table[row][column]:
+                self.modified = True
+                self.new_table[row][column].update(unaryRule)
+
+        if nTerminal in self.table[row][column]:
+            for first in set(nTerminal) | self.emptyRules:
+                for second in set(nTerminal) | self.emptyRules:
+                    if first in self.table[row][column] or second in self.table[row][column]:
+                        rule = self.findRule(first + second)
+                        self.modified = True
+                        self.new_table[row][column].update(rule)
+
 
         if column == self.word.__len__()-1:
             return
 
-        for col, tRules in enumerate(self.table[column+1]):
+        for col, tRules in enumerate(self.table[column+1] + [self.emptyRules]):
             if tRules == '':
                 continue
             for nTerm in tRules:
@@ -123,4 +166,4 @@ class E0LParser:
             self.tableHistory.append(self.table)
         return False
 
-E0LParser("aaaa", "demo.txt").parse()
+print(E0LParser("bcbc", "testRules.txt").parse())

@@ -28,9 +28,10 @@ for word in CFGWords:
         print("CFG parser failed on: ", word)
 
 
-E0LWords = E0LGenerator("testRules.txt").generate(4)
+E0LWordsGenerated = E0LGenerator("testRules.txt").generate(4)
 E0LCounter = 0
-for word in E0LWords:
+E0LCounterFail = 0
+for word in E0LWordsGenerated[0]:
     blockPrint()
     if E0LParser(word, "testRules.txt").parse():
         enablePrint()
@@ -38,6 +39,14 @@ for word in E0LWords:
     else:
         enablePrint()
         print("E0L parser failed on: ", word)
+for word in E0LWordsGenerated[1]:
+    blockPrint()
+    if E0LParser(word, "testRules.txt").parse() == False:
+        enablePrint()
+        E0LCounterFail = E0LCounterFail + 1
+    else:
+        enablePrint()
+        print("E0L parser should fail on: ", word)
 
 ET0LWords = ET0LGenerator("testRulesET0L.txt").generate(8)
 ET0LCounter = 0
@@ -53,5 +62,6 @@ for word in ET0LWords:
 
 enablePrint()
 print("Test result for CFG: ", CFGCounter, "/", CFGWords.__len__())
-print("Test result for E0L: ", E0LCounter, "/", E0LWords.__len__())
+print("Test result for E0L: ", E0LCounter, "/", E0LWordsGenerated[0].__len__())
+print("Test result for E0L false words: ", E0LCounterFail, "/", E0LWordsGenerated[1].__len__())
 print("Test result for ET0L: ", ET0LCounter, "/", ET0LWords.__len__())

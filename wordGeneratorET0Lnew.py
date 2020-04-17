@@ -15,6 +15,7 @@ class ET0LGenerator:
         self.wordStack = []
         self.indexStack = []
         self.ruleStack = []
+        self.historyStack = []
 
     def printResults(self):
         temp = list(self.results)
@@ -28,47 +29,19 @@ class ET0LGenerator:
                 return True
         return False
 
-    def generateFinal(self, w):
-        newWordStack = []
-        finalRuleStack = []
-        for x in self.rules:
-            newWordStack.append(w)
-            finalRuleStack.append(x)
-
-        while newWordStack.__len__() != 0:
-            word = newWordStack.pop()
-            ruleSet = finalRuleStack.pop()
-            if(word.islower()):
-                self.results.add(word)
-                return
-
-            for letterIndex in range(word.__len__()):
-                if not word[letterIndex].islower():
-                    for rule in ruleSet.get(word[letterIndex], []):
-                        if rule.islower():
-                            newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
-                            for x in self.rules:
-                                newWordStack.append(newWord)
-                                finalRuleStack.append(x)
-
-    def finalizeWords(self):
-        for x in self.rawResults:
-            self.generateFinal(x)
-
-    def generateWords(self, length):
+    def generateWords(self, length, parseWord = None):
         for x in self.rules:
             self.wordStack.append("S")
             self.indexStack.append(0)
             self.ruleStack.append(x)
+            self.historyStack.append(set())
             
         while self.wordStack.__len__() != 0:
             word = self.wordStack.pop()
             index = self.indexStack.pop()
             ruleSet = self.ruleStack.pop()
+            historyWords = self.historyStack.pop()
 
-            # word without non-terminal that is not right length
-            if word.islower() and word.__len__() != length:
-                continue
             # index that is too big
             if index > word.__len__():
                 continue
@@ -76,10 +49,13 @@ class ET0LGenerator:
             if word.__len__() > length:
                 continue
             # word of right size and is generated in paralel
-            if word.__len__() == length and index == 0:
-                self.rawResults.add(word)
+            if index == 0 and word.islower():
+                if parseWord != None and word == parseWord:
+                    return True
+                self.results.add(word)
                 continue
-
+            if word in historyWords:
+                continue
             if ruleSet.get(word[index], []) == []:
                 # No rule, throw away
                 continue
@@ -91,14 +67,23 @@ class ET0LGenerator:
                             self.wordStack.append(newWord)
                             self.indexStack.append((index + rule.__len__()) % newWord.__len__())
                             self.ruleStack.append(x)
+                            historyWords.add(word)
+                            self.historyStack.append(historyWords.copy())
                     else: 
                         self.wordStack.append(newWord)
                         self.indexStack.append((index + rule.__len__()) % newWord.__len__())
                         self.ruleStack.append(ruleSet)
+                        historyWords.add(word)
+                        self.historyStack.append(historyWords.copy())
 
     def generate(self, length):
         self.generateWords(length)
-        self.finalizeWords()
         return self.results
 
-print(ET0LGenerator("demoET0L.txt").generate(4))
+    def parse(self, word):
+        if self.generateWords(word.__len__(), word) == True:
+            return True
+        return False
+
+print(ET0LGenerator("demoET0L.txt").generate(10))
+print(ET0LGenerator("demoET0L.txt").parse("aaaaaaaa"))

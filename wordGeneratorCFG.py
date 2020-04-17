@@ -24,7 +24,7 @@ class ContextFreeGrammarGenerator:
             word = self.newWordStack.pop(0)
             if(word.__len__() > length):
                 continue
-            if(word.__len__() == length and word.islower()):
+            if(word.islower()):
                 self.results.add(word)
                 continue
             for letterIndex in range(word.__len__()):
@@ -36,5 +36,6 @@ class ContextFreeGrammarGenerator:
     def generate(self, length):
         self.generateWords("S", length)
         return self.results
+
 
 # print(ContextFreeGrammarGenerator("testRules.txt").generate(4))

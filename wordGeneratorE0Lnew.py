@@ -4,6 +4,7 @@
 
 from ruleReader import RuleReader
 from pprint import pprint
+import itertools
 
 class E0LGenerator:
 
@@ -11,9 +12,10 @@ class E0LGenerator:
         self.reader = RuleReader(ruleFile)
         self.rules = self.reader.getRulesDictionary()
         self.results = set()
-        self.rawResults = set()
+        self.falseWords = set()
         self.wordStack = []
         self.indexStack = []
+        self.historyStack = []
 
     def possibleRuleApplication(self, word):
         for x in word:
@@ -27,21 +29,25 @@ class E0LGenerator:
         for x in temp:
             print(x)
 
-    def generateWords(self, length):
+    def generateWords(self, length, parseWord = None):
         self.wordStack.append("S")
         self.indexStack.append(0)
+        self.historyStack.append(set())
 
         while self.wordStack.__len__() != 0:
             word = self.wordStack.pop()
             index = self.indexStack.pop()
+            historyWords = self.historyStack.pop()
 
-            if word.islower() and word.__len__() != length and not self.possibleRuleApplication(word):
+            if word in historyWords:
                 continue
             if index > word.__len__():
                 continue
             if word.__len__() > length:
                 continue
-            if word.__len__() == length and index == 0 and word.islower():
+            if index == 0 and word.islower():
+                if parseWord != None and word == parseWord:
+                    return True
                 # print("---", word)
                 self.results.add(word)
                 continue
@@ -54,10 +60,37 @@ class E0LGenerator:
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     self.wordStack.append(newWord)
                     self.indexStack.append((index + rule.__len__()) % newWord.__len__())
-                    
+                    historyWords.add(word)
+                    self.historyStack.append(historyWords.copy())
+
+    def getAllTerminals(self):
+        terminals = set()
+
+        for rule in self.rules:
+            if rule.islower():
+                terminals.add(rule)
+            for symbol in self.rules[rule]:
+                if symbol.islower():
+                    terminals.add(symbol)
+        return terminals
+
+    def generateFalseWords(self, length):
+        terminals = self.getAllTerminals()
+
+        result = set()
+        for x in itertools.combinations_with_replacement(list(terminals), length):
+            result.add(''.join(x))
+
+        return result - self.results
 
     def generate(self, length):
         self.generateWords(length)
-        return self.results
+        
+        return [self.results, self.generateFalseWords(length)]
+
+    def parse(self, word):
+        if self.generateWords(word.__len__(), word) == True:
+            return True
+        return False
 
 print(E0LGenerator("testRules.txt").generate(4))
