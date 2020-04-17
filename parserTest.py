@@ -5,11 +5,11 @@
 import getopt
 import sys, os
 from parserCFG import ContextFreeGrammarParser
-from parserE0L import E0LParser
-from parserET0L import ET0LParser
+from parserE0Lnew import E0LParser
+from parserET0Lnew import ET0LParser
 from wordGeneratorCFG import ContextFreeGrammarGenerator
-from wordGeneratorE0L import E0LGenerator
-from wordGeneratorET0L import ET0LGenerator
+from wordGeneratorE0Lnew import E0LGenerator
+from wordGeneratorET0Lnew import ET0LGenerator
 
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')
@@ -17,7 +17,7 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-CFGWords = ContextFreeGrammarGenerator("testRules.txt").generate(6)
+CFGWords = ContextFreeGrammarGenerator("testRules.txt").generate(4)
 CFGCounter = 0
 for word in CFGWords:
     blockPrint()
@@ -28,7 +28,7 @@ for word in CFGWords:
         print("CFG parser failed on: ", word)
 
 
-E0LWords = E0LGenerator("testRules.txt").generate(7)
+E0LWords = E0LGenerator("testRules.txt").generate(4)
 E0LCounter = 0
 for word in E0LWords:
     blockPrint()
@@ -52,8 +52,6 @@ for word in ET0LWords:
 
 
 enablePrint()
-print(CFGWords)
-print(E0LWords)
 print("Test result for CFG: ", CFGCounter, "/", CFGWords.__len__())
 print("Test result for E0L: ", E0LCounter, "/", E0LWords.__len__())
 print("Test result for ET0L: ", ET0LCounter, "/", ET0LWords.__len__())

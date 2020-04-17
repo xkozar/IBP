@@ -105,9 +105,9 @@ class E0LParser:
             self.printTable()
             for idr, row in enumerate(self.table):
                 for idc, tableRules in enumerate(row):
-                    if(tableRules is ''):
+                    if(tableRules is '' or idc < idr):
                         continue
-                    for nonTerminal in tableRules:
+                    for nonTerminal in tableRules | self.emptyRules:
                         self.reduceRules(idr, idc, nonTerminal)
 
             self.table = copy.deepcopy(self.new_table)
