@@ -15,6 +15,32 @@ class ET0LParser:
         self.emptyTable = [[set() for i in range(word.__len__())] for j in range(word.__len__())]
         self.new_table = [[set() for i in range(word.__len__())] for j in range(word.__len__())]
 
+    def fillEmptyRules(self, ruleTable):
+        tempEmptyRules = self.findRule("-", ruleTable)
+        emptyChanged = True
+
+        while emptyChanged:
+            emptyChanged = False
+            updateEmptySet = set()
+            for empty in tempEmptyRules:
+                newEmpty = self.findRule(empty, ruleTable)
+                if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                    emptyChanged = True
+                    updateEmptySet.update(newEmpty)
+            tempEmptyRules.update(updateEmptySet)
+
+            for empty1 in tempEmptyRules:
+                for empty2 in tempEmptyRules:
+                    newEmpty = self.findRule(empty1 + empty2, ruleTable)
+                    if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                        emptyChanged = True
+                        updateEmptySet.update(newEmpty)
+            tempEmptyRules.update(updateEmptySet)
+
+        print(tempEmptyRules)
+        return tempEmptyRules
+
+
     def compareTables(self, tab1, tab2):
         for row1, row2 in zip(tab1, tab2):
             for cell1, cell2 in zip(row1, row2):
@@ -64,11 +90,21 @@ class ET0LParser:
                 result.add(leftSide)
         return result
 
-    def reduceRules(self, row, column, nTerminal, rules, CYKtable, newCYKtable, modifiedContainer):
-        unaryRuleFound = self.findRule(nTerminal, rules)
+    def reduceRules(self, row, column, nTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules):
+        unaryRuleFound = self.findRule(nTerminal, ruleTable)
         if unaryRuleFound.__len__() > 0:
             self.modified = True
             newCYKtable[row][column].update(unaryRuleFound)
+
+        if nTerminal in CYKtable[row][column]:
+            for first in set(nTerminal) | emptyRules:
+                for second in set(nTerminal) | emptyRules:
+                    if first in CYKtable[row][column] or second in CYKtable[row][column]:
+                        rule = self.findRule(first + second, ruleTable)
+                        if rule.__len__() == 0:
+                            continue
+                        self.modified = True
+                        newCYKtable[row][column].update(rule)
 
         if column == self.word.__len__()-1:
             return
@@ -77,7 +113,7 @@ class ET0LParser:
             if tRules == '':
                 continue
             for nTerm in tRules:
-                result = self.findRule(nTerminal + nTerm, rules)
+                result = self.findRule(nTerminal + nTerm, ruleTable)
                 # if result == '':
                 #     continue
                 for character in result:
@@ -89,7 +125,7 @@ class ET0LParser:
         for diag, character in enumerate(self.word):
             table[diag][diag] = self.findRule(character, rules)
         
-    def CYK_loop(self, CYKtable, ruleTable, modified, tableHistory):
+    def CYK_loop(self, CYKtable, ruleTable, modified, tableHistory, emptyRules):
         currentHistory = copy.deepcopy(tableHistory)
         newCYKtable = copy.deepcopy(self.emptyTable)
 
@@ -100,7 +136,7 @@ class ET0LParser:
                 if(tableRules is ''):
                     continue
                 for nonTerminal in tableRules:
-                    self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer)
+                    self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
 
         if "S" in newCYKtable[0][self.word.__len__()-1]:
             self.printTable(newCYKtable)
@@ -113,7 +149,7 @@ class ET0LParser:
 
         if modifiedContainer[0]:
             for rulesTable in self.rules:
-                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory):
+                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, emptyRules):
                     return True
 
     def parse(self):
@@ -123,8 +159,9 @@ class ET0LParser:
             tableHistory = []
             # This will start first step, need to use all tables again
             for rulesTable2 in self.rules:
-                if self.CYK_loop(table, rulesTable2, True, tableHistory):
+                emptyRules = self.fillEmptyRules(rulesTable2)
+                if self.CYK_loop(table, rulesTable2, True, tableHistory, emptyRules):
                     return True
         return False
 
-print(ET0LParser("aaaa", "demoET0L.txt").parse())
+print(ET0LParser("a", "demo.txt").parse())

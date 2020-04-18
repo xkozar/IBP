@@ -122,9 +122,10 @@ class E0LParser:
                 for second in set(nTerminal) | self.emptyRules:
                     if first in self.table[row][column] or second in self.table[row][column]:
                         rule = self.findRule(first + second)
+                        if rule.__len__() == 0:
+                            continue
                         self.modified = True
                         self.new_table[row][column].update(rule)
-
 
         if column == self.word.__len__()-1:
             return
@@ -150,7 +151,7 @@ class E0LParser:
                 for idc, tableRules in enumerate(row):
                     if(tableRules is '' or idc < idr):
                         continue
-                    for nonTerminal in tableRules | self.emptyRules:
+                    for nonTerminal in tableRules:
                         self.reduceRules(idr, idc, nonTerminal)
 
             self.table = copy.deepcopy(self.new_table)
@@ -166,4 +167,4 @@ class E0LParser:
             self.tableHistory.append(self.table)
         return False
 
-print(E0LParser("bcbc", "testRules.txt").parse())
+print(E0LParser("a", "demo.txt").parse())
