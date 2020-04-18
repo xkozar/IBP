@@ -78,7 +78,7 @@ class E0LGenerator:
         terminals = self.getAllTerminals()
 
         result = set()
-        for x in itertools.combinations_with_replacement(list(terminals), length):
+        for x in itertools.product(list(terminals), repeat=length):
             result.add(''.join(x))
 
         return result - self.results
