@@ -6,7 +6,7 @@ from ruleReader import RuleReader
 from pprint import pprint
 import copy
 
-class E0LParser:
+class E0LParserCYK:
 
     def __init__(self, word, rules):
         self.word = word
@@ -167,4 +167,4 @@ class E0LParser:
             self.tableHistory.append(self.table)
         return False
 
-print(E0LParser("a", "demo.txt").parse())
+print(E0LParserCYK("a", "demo.txt").parse())

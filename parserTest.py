@@ -5,11 +5,11 @@
 import getopt
 import sys, os
 from parserCFG import ContextFreeGrammarParser
-from parserE0Lnew import E0LParser
-from parserET0Lnew import ET0LParser
-from wordGeneratorCFG import ContextFreeGrammarGenerator
-from wordGeneratorE0Lnew import E0LGenerator
-from wordGeneratorET0Lnew import ET0LGenerator
+from parserE0Lnew import E0LParserCYK
+from parserET0Lnew import ET0LParserCYK
+from topDownCFGParser import TopDownCFGParser
+from topDownE0LParser import TopDownE0LParser
+from topDownET0LParser import TopDownET0LParser
 
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')
@@ -17,7 +17,7 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-CFGWords = ContextFreeGrammarGenerator("testRules.txt").generate(4)
+CFGWords = TopDownCFGParser("testRules.txt").generate(4)
 CFGCounter = 0
 for word in CFGWords:
     blockPrint()
@@ -28,12 +28,12 @@ for word in CFGWords:
         print("CFG parser failed on: ", word)
 
 
-E0LWordsGenerated = E0LGenerator("testRules.txt").generate(4)
+E0LWordsGenerated = TopDownE0LParser("testRules.txt").generate(4, startWord="S")
 E0LCounter = 0
 E0LCounterFail = 0
 for word in E0LWordsGenerated[0]:
     blockPrint()
-    if E0LParser(word, "testRules.txt").parse():
+    if E0LParserCYK(word, "testRules.txt").parse():
         enablePrint()
         E0LCounter = E0LCounter + 1
     else:
@@ -41,19 +41,19 @@ for word in E0LWordsGenerated[0]:
         print("E0L parser failed on: ", word)
 for word in E0LWordsGenerated[1]:
     blockPrint()
-    if E0LParser(word, "testRules.txt").parse() == False:
+    if E0LParserCYK(word, "testRules.txt").parse() == False:
         enablePrint()
         E0LCounterFail = E0LCounterFail + 1
     else:
         enablePrint()
         print("E0L parser should fail on: ", word)
 
-ET0LWords = ET0LGenerator("testRulesET0L.txt").generate(8)
+ET0LWords = TopDownET0LParser("testRulesET0L.txt").generate(8, startWord="S")
 ET0LCounter = 0
 
 for word in ET0LWords:
     blockPrint()
-    if ET0LParser(word, "testRulesET0L.txt").parse():
+    if ET0LParserCYK(word, "testRulesET0L.txt").parse():
         ET0LCounter = ET0LCounter + 1
     else:
         enablePrint()

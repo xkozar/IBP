@@ -4,8 +4,9 @@
 
 from ruleReaderET0L import RuleReader
 from pprint import pprint
+import itertools
 
-class ET0LGenerator:
+class TopDownET0LParser:
 
     def __init__(self, ruleFile):
         self.reader = RuleReader(ruleFile)
@@ -29,9 +30,9 @@ class ET0LGenerator:
                 return True
         return False
 
-    def generateWords(self, length, parseWord = None):
+    def generateWords(self, length, startWord="S", parseWord = None):
         for x in self.rules:
-            self.wordStack.append("S")
+            self.wordStack.append(startWord)
             self.indexStack.append(0)
             self.ruleStack.append(x)
             self.historyStack.append(set())
@@ -76,14 +77,34 @@ class ET0LGenerator:
                         historyWords.add(word)
                         self.historyStack.append(historyWords.copy())
 
-    def generate(self, length):
-        self.generateWords(length)
+    def getAllTerminals(self):
+        terminals = set()
+
+        for rule in self.rules:
+            if rule.islower():
+                terminals.add(rule)
+            for symbol in self.rules[rule]:
+                if symbol.islower():
+                    terminals.add(symbol)
+        return terminals
+
+    def generateFalseWords(self, length):
+        terminals = self.getAllTerminals()
+
+        result = set()
+        for x in itertools.product(list(terminals), repeat=length):
+            result.add(''.join(x))
+
+        return result - self.results
+
+    def generate(self, length, startWord):
+        self.generateWords(length, startWord=startWord)
         return self.results
 
-    def parse(self, word):
+    def parse(self, word, startWord):
         if self.generateWords(word.__len__(), word) == True:
             return True
         return False
 
-print(ET0LGenerator("demoET0L.txt").generate(10))
-print(ET0LGenerator("demoET0L.txt").parse("aaaaaaaa"))
+print(TopDownET0LParser("demoET0L.txt").generate(10, startWord="S"))
+print(TopDownET0LParser("demoET0L.txt").parse("aaaaaaaa", startWord="S"))

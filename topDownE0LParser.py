@@ -6,7 +6,7 @@ from ruleReader import RuleReader
 from pprint import pprint
 import itertools
 
-class E0LGenerator:
+class TopDownE0LParser:
 
     def __init__(self, ruleFile):
         self.reader = RuleReader(ruleFile)
@@ -29,8 +29,8 @@ class E0LGenerator:
         for x in temp:
             print(x)
 
-    def generateWords(self, length, parseWord = None):
-        self.wordStack.append("S")
+    def generateWords(self, length, startWord="S", parseWord = None):
+        self.wordStack.append(startWord)
         self.indexStack.append(0)
         self.historyStack.append(set())
 
@@ -83,7 +83,7 @@ class E0LGenerator:
 
         return result - self.results
 
-    def generate(self, length):
+    def generate(self, length, startWord):
         self.generateWords(length)
         
         return [self.results, self.generateFalseWords(length)]
@@ -93,4 +93,4 @@ class E0LGenerator:
             return True
         return False
 
-print(E0LGenerator("testRules.txt").generate(4))
+print(TopDownE0LParser("testRules.txt").generate(4))

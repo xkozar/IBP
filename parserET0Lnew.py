@@ -6,7 +6,7 @@ from ruleReaderET0L import RuleReader
 from pprint import pprint
 import copy
 
-class ET0LParser:
+class ET0LParserCYK:
 
     def __init__(self, word, rules):
         self.word = word
@@ -164,4 +164,4 @@ class ET0LParser:
                     return True
         return False
 
-print(ET0LParser("a", "demo.txt").parse())
+print(ET0LParserCYK("a", "demo.txt").parse())
