@@ -154,17 +154,17 @@ class E0LParserCYK:
                     for nonTerminal in tableRules:
                         self.reduceRules(idr, idc, nonTerminal)
 
-            self.table = copy.deepcopy(self.new_table)
-            self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
-
-            if "S" in self.table[0][self.word.__len__()-1]:
-                self.printTable()
-                return True
-            
-            if self.findInHistory(self.table):
+            if self.findInHistory(self.new_table):
                 print("Loop detected")
                 return False
-            self.tableHistory.append(self.table)
+            self.tableHistory.append(self.new_table)
+
+            if "S" in self.new_table[0][self.word.__len__()-1]:
+                self.printTable()
+                return True
+
+            self.table = copy.deepcopy(self.new_table)
+            self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         return False
 
-print(E0LParserCYK("a", "demo.txt").parse())
+# print(E0LParserCYK("a", "demo.txt").parse())

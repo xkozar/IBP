@@ -101,10 +101,10 @@ class TopDownET0LParser:
         self.generateWords(length, startWord=startWord)
         return self.results
 
-    def parse(self, word, startWord):
-        if self.generateWords(word.__len__(), word) == True:
+    def parse(self, word, startWord="S"):
+        if self.generateWords(word.__len__(), word, startWord) == True:
             return True
         return False
 
-print(TopDownET0LParser("demoET0L.txt").generate(10, startWord="S"))
-print(TopDownET0LParser("demoET0L.txt").parse("aaaaaaaa", startWord="S"))
+# print(TopDownET0LParser("demoET0L.txt").generate(10, startWord="S"))
+# print(TopDownET0LParser("demoET0L.txt").parse("aaaaaaaa", startWord="S"))

@@ -138,15 +138,15 @@ class ET0LParserCYK:
                 for nonTerminal in tableRules:
                     self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
 
-        if "S" in newCYKtable[0][self.word.__len__()-1]:
-            self.printTable(newCYKtable)
-            return True
-        
         if self.findInHistory(newCYKtable, currentHistory):
             print("Loop detected")
             return False
         currentHistory.append(CYKtable)
 
+        if "S" in newCYKtable[0][self.word.__len__()-1]:
+            self.printTable(newCYKtable)
+            return True
+        
         if modifiedContainer[0]:
             for rulesTable in self.rules:
                 if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, emptyRules):
@@ -164,4 +164,4 @@ class ET0LParserCYK:
                     return True
         return False
 
-print(ET0LParserCYK("a", "demo.txt").parse())
+# print(ET0LParserCYK("a", "demo.txt").parse())

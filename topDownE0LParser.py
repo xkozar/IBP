@@ -29,7 +29,7 @@ class TopDownE0LParser:
         for x in temp:
             print(x)
 
-    def generateWords(self, length, startWord="S", parseWord = None):
+    def generateWords(self, length, startWord="S", parseWord=None):
         self.wordStack.append(startWord)
         self.indexStack.append(0)
         self.historyStack.append(set())
@@ -83,14 +83,14 @@ class TopDownE0LParser:
 
         return result - self.results
 
-    def generate(self, length, startWord):
+    def generate(self, length, startWord="S"):
         self.generateWords(length)
         
         return [self.results, self.generateFalseWords(length)]
 
-    def parse(self, word):
-        if self.generateWords(word.__len__(), word) == True:
+    def parse(self, word, startWord="S"):
+        if self.generateWords(word.__len__(), word, startWord) == True:
             return True
         return False
 
-print(TopDownE0LParser("testRules.txt").generate(4))
+# print(TopDownE0LParser("testRules.txt").generate(4))
