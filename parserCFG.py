@@ -6,7 +6,7 @@ from ruleReader import RuleReader
 from pprint import pprint
 import sys
 
-class ContextFreeGrammarParser:
+class CFGParserCYK:
 
     def __init__(self, word, rules):
         self.word = word

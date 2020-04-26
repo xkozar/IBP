@@ -4,9 +4,9 @@
 
 import getopt
 import sys, os
-from parserCFG import ContextFreeGrammarParser
-from parserE0Lnew import E0LParserCYK
-from parserET0Lnew import ET0LParserCYK
+from parserCFG import CFGParserCYK
+from parserE0L import E0LParserCYK
+from parserET0L import ET0LParserCYK
 from topDownCFGParser import TopDownCFGParser
 from topDownE0LParser import TopDownE0LParser
 from topDownET0LParser import TopDownET0LParser
@@ -21,7 +21,7 @@ CFGWords = TopDownCFGParser("testRules.txt").generate(4)
 CFGCounter = 0
 for word in CFGWords:
     blockPrint()
-    if ContextFreeGrammarParser(word, "testRules.txt").parse():
+    if CFGParserCYK(word, "testRules.txt").parse():
         CFGCounter = CFGCounter + 1
     else:
         enablePrint()

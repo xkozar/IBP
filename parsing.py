@@ -4,7 +4,7 @@
 
 import getopt
 import sys
-from parserCFG import ContextFreeGrammarParser
+from parserCFG import CFGParserCYK
 from parserE0Lnew import E0LParserCYK
 from parserET0Lnew import ET0LParserCYK
 from topDownCFGParser import TopDownCFGParser
@@ -87,7 +87,7 @@ for flag, value in opts:
                 print("Fail")
         else:
             print("Using context free grammar parser (Cocke-Younger-Kasami)")
-            if ContextFreeGrammarParser(word, rulesFile).parse():
+            if CFGParserCYK(word, rulesFile).parse():
                 print("Success")
             else:
                 print("Fail")
