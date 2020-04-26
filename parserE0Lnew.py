@@ -98,25 +98,18 @@ class E0LParserCYK:
                 result.add(leftSide)
         return result
 
-    def findPartialRule(self, rightSide):
-        result = set()
-        for leftSide in self.rules:
-            for rule in self.rules[leftSide]:
-                if rightSide in rule and rule.__len__() ==  2:
-                    result.add(leftSide)
-        return result
-
     def reduceRules(self, row, column, nTerminal):
         if nTerminal == "":
             return
-        unaryRuleFound = self.findRule(nTerminal)
-
         
+        # Reduce unary rules
+        unaryRuleFound = self.findRule(nTerminal)
         for unaryRule in unaryRuleFound:
             if nTerminal in self.table[row][column]:
                 self.modified = True
                 self.new_table[row][column].update(unaryRule)
 
+        # Reduce rules where 1 nonterminal can be erased
         if nTerminal in self.table[row][column]:
             for first in set(nTerminal) | self.emptyRules:
                 for second in set(nTerminal) | self.emptyRules:
@@ -127,18 +120,19 @@ class E0LParserCYK:
                         self.modified = True
                         self.new_table[row][column].update(rule)
 
+        # This column cannot be reduced using pairs, since it looks for row = column + 1 and that is out of bounds
         if column == self.word.__len__()-1:
             return
 
+        # Reduce normal pairs
         for col, tRules in enumerate(self.table[column+1] + [self.emptyRules]):
             if tRules == '':
                 continue
             for nTerm in tRules:
                 result = self.findRule(nTerminal + nTerm)
                 for character in result:
-                    if not character in self.table[row][col]:
-                        self.new_table[row][col].add(character)
-                        self.modified = True
+                    self.new_table[row][col].add(character)
+                    self.modified = True
 
     def parse(self): 
         print("Word: " + self.word)

@@ -114,14 +114,12 @@ class ET0LParserCYK:
                 continue
             for nTerm in tRules:
                 result = self.findRule(nTerminal + nTerm, ruleTable)
-                # if result == '':
-                #     continue
                 for character in result:
-                    if not character in CYKtable[row][col]:
-                        newCYKtable[row][col].add(character)
-                        modifiedContainer[0] = True
+                    # if not character in CYKtable[row][col]:
+                    newCYKtable[row][col].add(character)
+                    modifiedContainer[0] = True
 
-    def set_initial_rules(self, table, rules):
+    def fillStart(self, table, rules):
         for diag, character in enumerate(self.word):
             table[diag][diag] = self.findRule(character, rules)
         
@@ -155,7 +153,7 @@ class ET0LParserCYK:
     def parse(self):
         for rulesTable in self.rules:
             table = copy.deepcopy(self.emptyTable)
-            self.set_initial_rules(table, rulesTable)
+            self.fillStart(table, rulesTable)
             tableHistory = []
             # This will start first step, need to use all tables again
             for rulesTable2 in self.rules:
