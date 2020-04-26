@@ -12,7 +12,7 @@ class ContextFreeGrammarParser:
         self.word = word
         self.reader = RuleReader(rules)
         self.rules = self.reader.contentToRules(True)
-        self.table = [['' for i in range(word.__len__())] for j in range(word.__len__())]
+        self.table = [[set() for i in range(word.__len__())] for j in range(word.__len__())]
         self.modified = True # Determines whether rules table was modified
 
     def printTable(self):
@@ -30,7 +30,10 @@ class ContextFreeGrammarParser:
                 if y != 0 and y != row.__len__():
                     rowToPrint += "|"
                 spacePadding = (sizeTemplate[y] - value.__len__()) * " "
-                rowToPrint += " " + value + spacePadding + " "
+                cellValue = ""
+                for val in value:
+                    cellValue = cellValue + val
+                rowToPrint += " " + cellValue + spacePadding + " "
             rowToPrint += "]"
             if x == 0:
                 print()
@@ -58,15 +61,15 @@ class ContextFreeGrammarParser:
                 # if result == '':
                 #     continue
                 for character in result:
-                    if self.table[row][col].find(character) < 0:
-                        self.table[row][col] = self.table[row][col] + character
+                    if not character in self.table[row][col]:
+                        self.table[row][col].add(character)
                         self.modified = True
 
     def parse(self):
         for i in range(self.word.__len__()):
             for lSide in self.rules:
                 if self.word[i] in self.rules[lSide]:
-                    self.table[i][i] = self.table[i][i] + lSide
+                    self.table[i][i].add(lSide)
 
         while self.modified:
             self.modified = False
@@ -77,9 +80,8 @@ class ContextFreeGrammarParser:
                         for nonTerminal in tableRules:
                             self.findPairForRule(idr, idc, nonTerminal)
 
-
         # self.printTable()
-        if self.table[0][self.word.__len__()-1].find('S') >= 0:
+        if "S" in self.table[0][self.word.__len__()-1]:
             return True
         else:
             return False
