@@ -11,7 +11,7 @@ class TopDownE0LParser:
     def __init__(self, ruleFile):
         self.reader = RuleReader(ruleFile)
         self.rules = self.reader.getRulesDictionary()
-        self.results = set()
+        self.generatedWords = set()
         self.falseWords = set()
         self.wordStack = []
         self.indexStack = []
@@ -24,7 +24,7 @@ class TopDownE0LParser:
         return False
 
     def printResults(self):
-        temp = list(self.results)
+        temp = list(self.generatedWords)
         temp.sort()
         for x in temp:
             print(x)
@@ -49,7 +49,7 @@ class TopDownE0LParser:
                 if parseWord != None and word == parseWord:
                     return True
                 # print("---", word)
-                self.results.add(word)
+                self.generatedWords.add(word)
                 continue
 
             if self.rules.get(word[index], []) == []:
@@ -81,12 +81,12 @@ class TopDownE0LParser:
         for x in itertools.product(list(terminals), repeat=length):
             result.add(''.join(x))
 
-        return result - self.results
+        return result - self.generatedWords
 
     def generate(self, length, startWord="S"):
         self.generateWords(length)
         
-        return [self.results, self.generateFalseWords(length)]
+        return (self.generatedWords, self.generateFalseWords(length))
 
     def parse(self, word, startWord="S"):
         if self.generateWords(word.__len__(), word, startWord) == True:

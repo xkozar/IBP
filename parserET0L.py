@@ -128,7 +128,7 @@ class ET0LParserCYK:
         newCYKtable = copy.deepcopy(self.emptyTable)
 
         modifiedContainer = [modified]
-        self.printTable(CYKtable)
+        # self.printTable(CYKtable)
         for idr, row in enumerate(CYKtable):
             for idc, tableRules in enumerate(row):
                 if(tableRules is ''):
@@ -137,11 +137,14 @@ class ET0LParserCYK:
                     self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
 
         if self.findInHistory(newCYKtable, currentHistory):
-            print("Loop detected")
+            # print("Loop detected")
             return False
         currentHistory.append(CYKtable)
 
         if "S" in newCYKtable[0][self.word.__len__()-1]:
+            # self.printTable(newCYKtable)
+            for x in currentHistory:
+                self.printTable(x)
             self.printTable(newCYKtable)
             return True
         
@@ -158,8 +161,8 @@ class ET0LParserCYK:
             # This will start first step, need to use all tables again
             for rulesTable2 in self.rules:
                 emptyRules = self.fillEmptyRules(rulesTable2)
-                if self.CYK_loop(table, rulesTable2, True, tableHistory, emptyRules):
+                if self.CYK_loop(table, rulesTable2, False, tableHistory, emptyRules):
                     return True
         return False
 
-# print(ET0LParserCYK("a", "demo.txt").parse())
+print(ET0LParserCYK("ab", "demo.txt").parse())
