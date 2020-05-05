@@ -1,6 +1,11 @@
 S -> AB
 A -> a
-A -> AB
+A -> BC
 B -> BC
 B -> b
 C -> c
+C -> BC
+A -> g
+A -> b
+B -> c
+C -> b
