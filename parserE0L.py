@@ -129,7 +129,7 @@ class E0LParserCYK:
             return
 
         # Reduce normal pairs
-        for col, tRules in enumerate(self.table[column+1] + [self.emptyRules]):
+        for col, tRules in enumerate(self.table[column+1]):
             if tRules == '':
                 continue
             for nTerm in tRules:
@@ -167,4 +167,4 @@ class E0LParserCYK:
             self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         return False
 
-# print(E0LParserCYK("testRules.txt").parse("ab"))
+print(E0LParserCYK("newTestRules.txt").parse("bc"))

@@ -56,6 +56,8 @@ class TopDownE0LParser:
                 continue
             else:
                 for rule in self.rules.get(word[index], []):
+                    if rule == "-":
+                        rule = ""
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     self.wordStack.append(newWord)
                     self.indexStack.append((index + rule.__len__()) % newWord.__len__())
