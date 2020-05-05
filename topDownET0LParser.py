@@ -88,7 +88,7 @@ class TopDownET0LParser:
                     terminals.add(symbol)
         return terminals
 
-    def generateAllWords(self, length):
+    def generateAllCombinations(self, length):
         terminals = set()
         for ruleSet in self.rules:    
             terminals = terminals | self.getAllTerminals(ruleSet)
@@ -100,7 +100,7 @@ class TopDownET0LParser:
 
         return result
 
-    def generate(self, length, startWord):
+    def generateValidWords(self, length, startWord="S"):
         self.generateWords(length, startWord=startWord)
         return self.results
 

@@ -74,7 +74,7 @@ class TopDownE0LParser:
                     terminals.add(symbol)
         return terminals
 
-    def generateAllWords(self, length):
+    def generateAllCombinations(self, length):
         terminals = self.getAllTerminals()
 
         result = set()
@@ -84,7 +84,7 @@ class TopDownE0LParser:
 
         return result
 
-    def generate(self, length, startWord="S"):
+    def generateValidWords(self, length, startWord="S"):
         self.generateWords(length)
         
         return self.generatedWords

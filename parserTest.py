@@ -17,51 +17,85 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-CFGWords = TopDownCFGParser("testRules.txt").generate(4)
+parserCFGCYK = CFGParserCYK("testRules.txt")
+topDownCFGParser = TopDownCFGParser("testRules.txt")
+CFGWordsGenerated = topDownCFGParser.generateValidWords(5)
+CFGFalseWords = topDownCFGParser.generateAllCombinations(5) - CFGWordsGenerated
 CFGCounter = 0
-for word in CFGWords:
+CFGCounterFail = 0
+for word in CFGWordsGenerated:
     blockPrint()
-    if CFGParserCYK(word, "testRules.txt").parse():
+    if parserCFGCYK.parse(word):
         CFGCounter = CFGCounter + 1
     else:
         enablePrint()
         print("CFG parser failed on: ", word)
 
+for word in CFGFalseWords:
+    blockPrint()
+    if parserCFGCYK.parse(word) == False:
+        enablePrint()
+        CFGCounterFail = CFGCounterFail + 1
+    else:
+        enablePrint()
+        print("CFG parser should fail on: ", word)
 
-E0LWordsGenerated = TopDownE0LParser("testRules.txt").generate(4, startWord="S")
+
+parserE0LCYK = E0LParserCYK("testRules.txt")
+topDownE0LParser = TopDownE0LParser("testRules.txt")
+E0LWordsGenerated = topDownE0LParser.generateValidWords(10, startWord="S")
+E0LFalseWords = topDownE0LParser.generateAllCombinations(5) - E0LWordsGenerated
 E0LCounter = 0
 E0LCounterFail = 0
-for word in E0LWordsGenerated[0]:
+
+for word in E0LWordsGenerated | {"hello"}:
     blockPrint()
-    if E0LParserCYK(word, "testRules.txt").parse():
+    if parserE0LCYK.parse(word):
         enablePrint()
         E0LCounter = E0LCounter + 1
     else:
         enablePrint()
         print("E0L parser failed on: ", word)
-for word in E0LWordsGenerated[1]:
+
+for word in E0LFalseWords | {"bcbc"}:
     blockPrint()
-    if E0LParserCYK(word, "testRules.txt").parse() == False:
+    if parserE0LCYK.parse(word) == False:
         enablePrint()
         E0LCounterFail = E0LCounterFail + 1
     else:
         enablePrint()
         print("E0L parser should fail on: ", word)
 
-ET0LWords = TopDownET0LParser("testRulesET0L.txt").generate(8, startWord="S")
+parserET0LCYK = ET0LParserCYK("testRulesET0L.txt")
+topDownET0LParser = TopDownET0LParser("testRulesET0L.txt")
+ET0LWordsGenerated = topDownET0LParser.generateValidWords(5, startWord="S")
+ET0LFalseWords = topDownET0LParser.generateAllCombinations(5) - ET0LWordsGenerated
 ET0LCounter = 0
+ET0LCounterFail = 0
 
-for word in ET0LWords:
+
+for word in ET0LWordsGenerated:
     blockPrint()
-    if ET0LParserCYK(word, "testRulesET0L.txt").parse():
+    if parserET0LCYK.parse(word):
         ET0LCounter = ET0LCounter + 1
     else:
         enablePrint()
         print("ET0L parser failed on: ", word)
 
+for word in ET0LFalseWords:
+    blockPrint()
+    if parserET0LCYK.parse(word) == False:
+        enablePrint()
+        ET0LCounterFail = ET0LCounterFail + 1
+    else:
+        enablePrint()
+        print("ET0L parser should fail on: ", word)
+
 
 enablePrint()
-print("Test result for CFG: ", CFGCounter, "/", CFGWords.__len__())
-print("Test result for E0L: ", E0LCounter, "/", E0LWordsGenerated[0].__len__())
-print("Test result for E0L false words: ", E0LCounterFail, "/", E0LWordsGenerated[1].__len__())
-print("Test result for ET0L: ", ET0LCounter, "/", ET0LWords.__len__())
+print("Test passed for CFG: ", CFGCounter, "/", CFGWordsGenerated.__len__())
+print("Test passed for CFG false words: ", CFGCounterFail, "/", CFGFalseWords.__len__())
+print("Test passed for E0L: ", E0LCounter, "/", E0LWordsGenerated.__len__() + 1)
+print("Test passed for E0L false words: ", E0LCounterFail, "/", E0LFalseWords.__len__() + 1)
+print("Test passed for ET0L: ", ET0LCounter, "/", ET0LWordsGenerated.__len__())
+print("Test passed for ET0L false words: ", ET0LCounterFail, "/", ET0LFalseWords.__len__())

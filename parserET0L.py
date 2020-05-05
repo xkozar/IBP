@@ -8,12 +8,16 @@ import copy
 
 class ET0LParserCYK:
 
-    def __init__(self, word, rules):
-        self.word = word
+    def __init__(self, rules):
+        self.word = ""
         self.reader = RuleReader(rules)
         self.rules = self.reader.contentToRules(True)
-        self.emptyTable = [[set() for i in range(word.__len__())] for j in range(word.__len__())]
-        self.new_table = [[set() for i in range(word.__len__())] for j in range(word.__len__())]
+        self.initTables()
+
+    def initTables(self):
+        self.emptyTable = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+        self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+
 
     def fillEmptyRules(self, ruleTable):
         tempEmptyRules = self.findRule("-", ruleTable)
@@ -153,7 +157,9 @@ class ET0LParserCYK:
                 if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, emptyRules):
                     return True
 
-    def parse(self):
+    def parse(self, word):
+        self.word = word
+        self.initTables()
         for rulesTable in self.rules:
             table = copy.deepcopy(self.emptyTable)
             self.fillStart(table, rulesTable)
@@ -165,4 +171,4 @@ class ET0LParserCYK:
                     return True
         return False
 
-print(ET0LParserCYK("ab", "demo.txt").parse())
+# print(ET0LParserCYK("ab", "demo.txt").parse())

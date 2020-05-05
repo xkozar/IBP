@@ -4,6 +4,7 @@
 
 from ruleReader import RuleReader
 from pprint import pprint
+import itertools
 
 class TopDownCFGParser:
 
@@ -35,7 +36,28 @@ class TopDownCFGParser:
                     if newWord not in self.newWordStack:
                         self.newWordStack.append(newWord)
 
-    def generate(self, length):
+    def getAllTerminals(self):
+        terminals = set()
+
+        for rule in self.rules:
+            if rule.islower():
+                terminals.add(rule)
+            for symbol in self.rules[rule]:
+                if symbol.islower():
+                    terminals.add(symbol)
+        return terminals
+
+    def generateAllCombinations(self, length):
+        terminals = self.getAllTerminals()
+
+        result = set()
+        for generationLength in range(1, length + 1):
+            for x in itertools.product(list(terminals), repeat=generationLength):
+                result.add(''.join(x))
+
+        return result
+
+    def generateValidWords(self, length):
         self.generateWords("S", length)
         return self.results
 

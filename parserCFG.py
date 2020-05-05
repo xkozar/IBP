@@ -8,12 +8,16 @@ import sys
 
 class CFGParserCYK:
 
-    def __init__(self, word, rules):
-        self.word = word
+    def __init__(self, rules):
+        self.word = ""
         self.reader = RuleReader(rules)
         self.rules = self.reader.contentToRules(True)
-        self.table = [[set() for i in range(word.__len__())] for j in range(word.__len__())]
+        self.initTables()
+
+    def initTables(self):
         self.modified = True # Determines whether rules table was modified
+        self.table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+
 
     def printTable(self):
         temp = self.table.copy()
@@ -65,7 +69,9 @@ class CFGParserCYK:
                         self.table[row][col].add(character)
                         self.modified = True
 
-    def parse(self):
+    def parse(self, word):
+        self.word = word
+        self.initTables()
         for i in range(self.word.__len__()):
             for lSide in self.rules:
                 if self.word[i] in self.rules[lSide]:
@@ -86,3 +92,4 @@ class CFGParserCYK:
         else:
             return False
 
+# print(CFGParserCYK("bcbc", "demo.txt").parse())
