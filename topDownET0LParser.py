@@ -55,7 +55,7 @@ class TopDownET0LParser:
                     return True
                 self.results.add(word)
                 continue
-            if word in historyWords:
+            if word in historyWords and index == 0:
                 continue
             if ruleSet.get(word[index], []) == []:
                 # No rule, throw away
@@ -68,13 +68,15 @@ class TopDownET0LParser:
                             self.wordStack.append(newWord)
                             self.indexStack.append((index + rule.__len__()) % newWord.__len__())
                             self.ruleStack.append(x)
-                            historyWords.add(word)
+                            if index == 0:
+                                historyWords.add(word)
                             self.historyStack.append(historyWords.copy())
                     else: 
                         self.wordStack.append(newWord)
                         self.indexStack.append((index + rule.__len__()) % newWord.__len__())
                         self.ruleStack.append(ruleSet)
-                        historyWords.add(word)
+                        if index == 0:
+                            historyWords.add(word)
                         self.historyStack.append(historyWords.copy())
 
     def getAllTerminals(self, ruleSet):

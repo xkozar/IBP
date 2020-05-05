@@ -39,7 +39,7 @@ class TopDownE0LParser:
             index = self.indexStack.pop()
             historyWords = self.historyStack.pop()
 
-            if word in historyWords:
+            if word in historyWords and index == 0:
                 continue
             if index > word.__len__():
                 continue
@@ -48,7 +48,6 @@ class TopDownE0LParser:
             if index == 0 and word.islower():
                 if parseWord != None and word == parseWord:
                     return True
-                # print("---", word)
                 self.generatedWords.add(word)
                 continue
 
@@ -60,7 +59,8 @@ class TopDownE0LParser:
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     self.wordStack.append(newWord)
                     self.indexStack.append((index + rule.__len__()) % newWord.__len__())
-                    historyWords.add(word)
+                    if index == 0:
+                        historyWords.add(word)
                     self.historyStack.append(historyWords.copy())
 
     def getAllTerminals(self):
