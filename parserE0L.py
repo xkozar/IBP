@@ -15,6 +15,7 @@ class E0LParserCYK:
         self.modified = True # Determines whether rules table was modified
         self.tableHistory = []
         self.emptyRules = set()
+        self.emptyRulesModified = True
         self.initTables()
         
 
@@ -23,31 +24,39 @@ class E0LParserCYK:
         self.table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         self.tableHistory = []
-        self.fillEmptyRules()
+        self.emptyRules = set()
+        self.emptyRulesModified = True
+
+        
 
     def fillEmptyRules(self):
-        tempEmptyRules = self.findRule("-")
-        emptyChanged = True
+        if self.emptyRules.__len__() == 0:
+            self.emptyRules = self.findRule("-")
+            if self.emptyRules.__len__() == 0:
+                self.emptyRulesModified = False
+            return
 
-        while emptyChanged:
-            emptyChanged = False
+        newlyReduced = set()
+
+        if self.emptyRulesModified:
+            self.emptyRulesModified = False
             updateEmptySet = set()
-            for empty in tempEmptyRules:
+            for empty in self.emptyRules:
                 newEmpty = self.findRule(empty)
-                if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                    emptyChanged = True
+                if self.emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                    self.emptyRulesModified = True
                     updateEmptySet.update(newEmpty)
-            tempEmptyRules.update(updateEmptySet)
+            newlyReduced.update(updateEmptySet)
 
-            for empty1 in tempEmptyRules:
-                for empty2 in tempEmptyRules:
+            for empty1 in self.emptyRules:
+                for empty2 in self.emptyRules:
                     newEmpty = self.findRule(empty1 + empty2)
-                    if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                        emptyChanged = True
+                    if self.emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                        self.emptyRulesModified = True
                         updateEmptySet.update(newEmpty)
-            tempEmptyRules.update(updateEmptySet)
+            newlyReduced.update(updateEmptySet)
 
-            self.emptyRules.update(tempEmptyRules)
+            self.emptyRules.update(newlyReduced)
 
     def compareTables(self, tab1, tab2):
         for row1, row2 in zip(tab1, tab2):
@@ -145,6 +154,7 @@ class E0LParserCYK:
         self.fillStart(self.word, self.table)
 
         while self.modified:
+            self.fillEmptyRules()
             self.modified = False
             self.printTable(self.table)
             for idr, row in enumerate(self.table):
@@ -154,7 +164,8 @@ class E0LParserCYK:
                     for nonTerminal in tableRules:
                         self.reduceRules(idr, idc, nonTerminal)
 
-            if self.findInHistory(self.new_table):
+            # Check is empty rules are still being processed
+            if self.findInHistory(self.new_table) and self.emptyRulesModified == False:
                 print("Loop detected")
                 return False
             self.tableHistory.append(self.new_table)
@@ -167,4 +178,4 @@ class E0LParserCYK:
             self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         return False
 
-print(E0LParserCYK("newTestRules.txt").parse("bc"))
+print(E0LParserCYK("newTestRules.txt").parse("caaac"))

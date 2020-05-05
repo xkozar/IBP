@@ -16,6 +16,7 @@ class TopDownE0LParser:
         self.wordStack = []
         self.indexStack = []
         self.historyStack = []
+        self.mustChangeStack = []
 
     def possibleRuleApplication(self, word):
         for x in word:
@@ -33,19 +34,21 @@ class TopDownE0LParser:
         self.wordStack.append(startWord)
         self.indexStack.append(0)
         self.historyStack.append(set())
+        self.mustChangeStack.append(False)
 
         while self.wordStack.__len__() != 0:
             word = self.wordStack.pop()
             index = self.indexStack.pop()
             historyWords = self.historyStack.pop()
+            mustChange = self.mustChangeStack.pop()
 
-            if word in historyWords and index == 0:
+            if word in historyWords and index == 0 and not mustChange:
                 continue
             if index > word.__len__():
                 continue
             if word.__len__() > length:
                 continue
-            if index == 0 and word.islower():
+            if index == 0 and word.islower() and not mustChange:
                 if parseWord != None and word == parseWord:
                     return True
                 self.generatedWords.add(word)
@@ -61,9 +64,10 @@ class TopDownE0LParser:
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     self.wordStack.append(newWord)
                     self.indexStack.append((index + rule.__len__()) % newWord.__len__())
-                    if index == 0:
+                    if index == 0 and not mustChange:
                         historyWords.add(word)
                     self.historyStack.append(historyWords.copy())
+                    self.mustChangeStack.append(rule == "")
 
     def getAllTerminals(self):
         terminals = set()

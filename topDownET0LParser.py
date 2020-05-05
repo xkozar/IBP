@@ -17,6 +17,7 @@ class TopDownET0LParser:
         self.indexStack = []
         self.ruleStack = []
         self.historyStack = []
+        self.mustChangeStack = []
 
     def printResults(self):
         temp = list(self.results)
@@ -36,12 +37,14 @@ class TopDownET0LParser:
             self.indexStack.append(0)
             self.ruleStack.append(x)
             self.historyStack.append(set())
+            self.mustChangeStack.append(False)
             
         while self.wordStack.__len__() != 0:
             word = self.wordStack.pop()
             index = self.indexStack.pop()
             ruleSet = self.ruleStack.pop()
             historyWords = self.historyStack.pop()
+            mustChange = self.mustChangeStack.pop()
 
             # index that is too big
             if index > word.__len__():
@@ -50,34 +53,39 @@ class TopDownET0LParser:
             if word.__len__() > length:
                 continue
             # word of right size and is generated in paralel
-            if index == 0 and word.islower():
+            if index == 0 and word.islower() and not mustChange:
                 if parseWord != None and word == parseWord:
                     return True
                 self.results.add(word)
                 continue
-            if word in historyWords and index == 0:
+            if word in historyWords and index == 0 and not mustChange:
                 continue
             if ruleSet.get(word[index], []) == []:
                 # No rule, throw away
                 continue
             else:
                 for rule in ruleSet.get(word[index], []):
+                    if rule == "-":
+                        rule = ""
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     if (index + rule.__len__()) % newWord.__len__() == 0:
                         for x in self.rules:
                             self.wordStack.append(newWord)
                             self.indexStack.append((index + rule.__len__()) % newWord.__len__())
                             self.ruleStack.append(x)
-                            if index == 0:
+                            if index == 0 and not mustChange:
                                 historyWords.add(word)
                             self.historyStack.append(historyWords.copy())
+                            self.mustChangeStack.append(rule == "")
+
                     else: 
                         self.wordStack.append(newWord)
                         self.indexStack.append((index + rule.__len__()) % newWord.__len__())
                         self.ruleStack.append(ruleSet)
-                        if index == 0:
+                        if index == 0 and not mustChange:
                             historyWords.add(word)
                         self.historyStack.append(historyWords.copy())
+                        self.mustChangeStack.append(rule == "")
 
     def getAllTerminals(self, ruleSet):
         terminals = set()

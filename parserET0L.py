@@ -19,30 +19,34 @@ class ET0LParserCYK:
         self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
 
 
-    def fillEmptyRules(self, ruleTable):
-        tempEmptyRules = self.findRule("-", ruleTable)
-        emptyChanged = True
+    def fillEmptyRules(self, emptyRules, ruleTable, emptyChangedContainer):
+        if emptyRules.__len__() == 0:
+            newlyReduced = self.findRule("-", ruleTable)
+            if newlyReduced.__len__() == 0:
+                emptyChangedContainer[0] = False
+            return newlyReduced
 
-        while emptyChanged:
-            emptyChanged = False
+        newlyReduced = set()
+
+        if emptyChangedContainer[0]:
+            emptyChangedContainer[0] = False
             updateEmptySet = set()
-            for empty in tempEmptyRules:
+            for empty in emptyRules:
                 newEmpty = self.findRule(empty, ruleTable)
-                if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                    emptyChanged = True
+                if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                    # emptyChangedContainer[0] = True
                     updateEmptySet.update(newEmpty)
-            tempEmptyRules.update(updateEmptySet)
+            newlyReduced.update(updateEmptySet)
 
-            for empty1 in tempEmptyRules:
-                for empty2 in tempEmptyRules:
+            for empty1 in emptyRules:
+                for empty2 in emptyRules:
                     newEmpty = self.findRule(empty1 + empty2, ruleTable)
-                    if tempEmptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                        emptyChanged = True
+                    if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
+                        # emptyChangedContainer[0] = True
                         updateEmptySet.update(newEmpty)
-            tempEmptyRules.update(updateEmptySet)
+            newlyReduced.update(updateEmptySet)
 
-        print(tempEmptyRules)
-        return tempEmptyRules
+        return newlyReduced
 
 
     def compareTables(self, tab1, tab2):
@@ -127,7 +131,9 @@ class ET0LParserCYK:
         for diag, character in enumerate(self.word):
             table[diag][diag] = self.findRule(character, rules)
         
-    def CYK_loop(self, CYKtable, ruleTable, modified, tableHistory, emptyRules):
+    def CYK_loop(self, CYKtable, ruleTable, modified, tableHistory, emptyRules, emptyModified):
+        emptyModifiedContainer = [emptyModified]
+        emptyRules = emptyRules | self.fillEmptyRules(emptyRules, ruleTable, emptyModifiedContainer)
         currentHistory = copy.deepcopy(tableHistory)
         newCYKtable = copy.deepcopy(self.emptyTable)
 
@@ -140,7 +146,7 @@ class ET0LParserCYK:
                 for nonTerminal in tableRules:
                     self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
 
-        if self.findInHistory(newCYKtable, currentHistory):
+        if self.findInHistory(newCYKtable, currentHistory) and emptyModified == False:
             # print("Loop detected")
             return False
         currentHistory.append(CYKtable)
@@ -154,7 +160,7 @@ class ET0LParserCYK:
         
         if modifiedContainer[0]:
             for rulesTable in self.rules:
-                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, emptyRules):
+                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, emptyRules, emptyModifiedContainer[0]):
                     return True
 
     def parse(self, word):
@@ -166,9 +172,8 @@ class ET0LParserCYK:
             tableHistory = []
             # This will start first step, need to use all tables again
             for rulesTable2 in self.rules:
-                emptyRules = self.fillEmptyRules(rulesTable2)
-                if self.CYK_loop(table, rulesTable2, False, tableHistory, emptyRules):
+                if self.CYK_loop(table, rulesTable2, False, tableHistory, set(), True):
                     return True
         return False
 
-# print(ET0LParserCYK("ab", "demo.txt").parse())
+# print(ET0LParserCYK("testRulesET0L.txt").parse("bcbcbcbcbcbcbcbcbc"))
