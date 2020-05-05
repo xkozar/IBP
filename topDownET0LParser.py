@@ -77,25 +77,28 @@ class TopDownET0LParser:
                         historyWords.add(word)
                         self.historyStack.append(historyWords.copy())
 
-    def getAllTerminals(self):
+    def getAllTerminals(self, ruleSet):
         terminals = set()
 
-        for rule in self.rules:
+        for rule in ruleSet:
             if rule.islower():
                 terminals.add(rule)
-            for symbol in self.rules[rule]:
+            for symbol in ruleSet[rule]:
                 if symbol.islower():
                     terminals.add(symbol)
         return terminals
 
-    def generateFalseWords(self, length):
-        terminals = self.getAllTerminals()
+    def generateAllWords(self, length):
+        terminals = set()
+        for ruleSet in self.rules:    
+            terminals = terminals | self.getAllTerminals(ruleSet)
 
         result = set()
-        for x in itertools.product(list(terminals), repeat=length):
-            result.add(''.join(x))
+        for generationLength in range(1, length + 1):
+            for x in itertools.product(list(terminals), repeat=generationLength):
+                result.add(''.join(x))
 
-        return result - self.results
+        return result
 
     def generate(self, length, startWord):
         self.generateWords(length, startWord=startWord)

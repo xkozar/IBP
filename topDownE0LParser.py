@@ -74,19 +74,21 @@ class TopDownE0LParser:
                     terminals.add(symbol)
         return terminals
 
-    def generateFalseWords(self, length):
+    def generateAllWords(self, length):
         terminals = self.getAllTerminals()
 
         result = set()
-        for x in itertools.product(list(terminals), repeat=length):
-            result.add(''.join(x))
+        for generationLength in range(1, length + 1):
+            for x in itertools.product(list(terminals), repeat=generationLength):
+                result.add(''.join(x))
 
-        return result - self.generatedWords
+        return result
 
     def generate(self, length, startWord="S"):
         self.generateWords(length)
         
-        return (self.generatedWords, self.generateFalseWords(length))
+        return self.generatedWords
+        
 
     def parse(self, word, startWord="S"):
         if self.generateWords(word.__len__(), word, startWord) == True:
