@@ -58,8 +58,7 @@ for word in E0LWordsGenerated:
         print("E0L parser failed on: ", word)
 
 for word in E0LFalseWords:
-    # blockPrint()
-    enablePrint()
+    blockPrint()
     if parserE0LCYK.parse(word) == False:
         enablePrint()
         E0LCounterFail = E0LCounterFail + 1
