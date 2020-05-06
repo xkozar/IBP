@@ -178,4 +178,4 @@ class E0LParserCYK:
             self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         return False
 
-print(E0LParserCYK("newTestRules.txt").parse("caaac"))
+# print(E0LParserCYK("newTestRules.txt").parse("caaac"))

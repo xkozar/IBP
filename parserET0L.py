@@ -34,7 +34,7 @@ class ET0LParserCYK:
             for empty in emptyRules:
                 newEmpty = self.findRule(empty, ruleTable)
                 if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                    # emptyChangedContainer[0] = True
+                    emptyChangedContainer[0] = True
                     updateEmptySet.update(newEmpty)
             newlyReduced.update(updateEmptySet)
 
@@ -42,7 +42,7 @@ class ET0LParserCYK:
                 for empty2 in emptyRules:
                     newEmpty = self.findRule(empty1 + empty2, ruleTable)
                     if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                        # emptyChangedContainer[0] = True
+                        emptyChangedContainer[0] = True
                         updateEmptySet.update(newEmpty)
             newlyReduced.update(updateEmptySet)
 
@@ -99,11 +99,17 @@ class ET0LParserCYK:
         return result
 
     def reduceRules(self, row, column, nTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules):
-        unaryRuleFound = self.findRule(nTerminal, ruleTable)
-        if unaryRuleFound.__len__() > 0:
-            self.modified = True
-            newCYKtable[row][column].update(unaryRuleFound)
+        if nTerminal == "":
+            return
 
+        # Reduce unary rules
+        unaryRuleFound = self.findRule(nTerminal, ruleTable)
+        for unaryRule in unaryRuleFound:
+            if nTerminal in CYKtable[row][column]:
+                modifiedContainer[0] = True
+                newCYKtable[row][column].update(unaryRule)
+
+        # Reduce rules where 1 nonterminal can be erased
         if nTerminal in CYKtable[row][column]:
             for first in set(nTerminal) | emptyRules:
                 for second in set(nTerminal) | emptyRules:
@@ -111,12 +117,13 @@ class ET0LParserCYK:
                         rule = self.findRule(first + second, ruleTable)
                         if rule.__len__() == 0:
                             continue
-                        self.modified = True
+                        modifiedContainer[0] = True
                         newCYKtable[row][column].update(rule)
 
         if column == self.word.__len__()-1:
             return
 
+        # Reduce normal pairs
         for col, tRules in enumerate(CYKtable[column+1]):
             if tRules == '':
                 continue
@@ -176,4 +183,4 @@ class ET0LParserCYK:
                     return True
         return False
 
-# print(ET0LParserCYK("testRulesET0L.txt").parse("bcbcbcbcbcbcbcbcbc"))
+# print(ET0LParserCYK("testRulesET0L.txt").parse("bca"))
