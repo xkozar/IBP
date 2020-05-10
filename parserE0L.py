@@ -157,6 +157,7 @@ class E0LParserCYK:
             self.fillEmptyRules()
             self.modified = False
             self.printTable(self.table)
+            
             for idr, row in enumerate(self.table):
                 for idc, tableRules in enumerate(row):
                     if(tableRules is '' or idc < idr):
@@ -170,6 +171,7 @@ class E0LParserCYK:
                 return False
             self.tableHistory.append(self.new_table)
 
+
             if "S" in self.new_table[0][self.word.__len__()-1]:
                 self.printTable(self.new_table)
                 return True
@@ -178,4 +180,4 @@ class E0LParserCYK:
             self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         return False
 
-# print(E0LParserCYK("newTestRules.txt").parse("caaac"))
+print(E0LParserCYK("newTestRules.txt").parse("bcbc"))

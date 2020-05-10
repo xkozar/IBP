@@ -40,11 +40,11 @@ class TopDownET0LParser:
             self.mustChangeStack.append(False)
             
         while self.wordStack.__len__() != 0:
-            word = self.wordStack.pop()
-            index = self.indexStack.pop()
-            ruleSet = self.ruleStack.pop()
-            historyWords = self.historyStack.pop()
-            mustChange = self.mustChangeStack.pop()
+            word = self.wordStack.pop(0)
+            index = self.indexStack.pop(0)
+            ruleSet = self.ruleStack.pop(0)
+            historyWords = self.historyStack.pop(0)
+            mustChange = self.mustChangeStack.pop(0)
 
             if index == 0:
                 word = word.replace("-", "")
@@ -56,7 +56,7 @@ class TopDownET0LParser:
             if index > word.__len__():
                 continue
             # word that is too long
-            if word.__len__() > length:
+            if word.replace("-", "").__len__() > length:
                 continue
             # word of right size and is generated in paralel
             if index == 0 and word.islower() and not mustChange:
@@ -124,5 +124,5 @@ class TopDownET0LParser:
             return True
         return False
 
-print(TopDownET0LParser("testRulesET0L.txt").generateValidWords(5, startWord="S"))
+# print(TopDownET0LParser("testRulesET0L.txt").generateValidWords(5, startWord="S"))
 # print(TopDownET0LParser("demoET0L.txt").parse("aaaaaaaa", startWord="S"))

@@ -17,35 +17,34 @@ class ET0LParserCYK:
     def initTables(self):
         self.emptyTable = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
+        self.CYKtableStack = []
+        self.ruleTableStack = []
+        self.modifiedStack = []
+        self.tableHistoryStack = []
+        self.emptyRulesStack = []
+        self.emptyModifiedStack = []
 
 
-    def fillEmptyRules(self, emptyRules, ruleTable, emptyChangedContainer):
-        if emptyRules.__len__() == 0:
-            newlyReduced = self.findRule("-", ruleTable)
-            if newlyReduced.__len__() == 0:
-                emptyChangedContainer[0] = False
-            return newlyReduced
-
+    def fillEmptyRules(self, emptyRules, ruleTable):
         newlyReduced = set()
 
-        if emptyChangedContainer[0]:
-            emptyChangedContainer[0] = False
-            updateEmptySet = set()
-            for empty in emptyRules:
-                newEmpty = self.findRule(empty, ruleTable)
+        updateEmptySet = set()
+
+        updateEmptySet.update(self.findRule("-", ruleTable))
+        # if newlyReduced.__len__() == 0:
+        #     emptyChangedContainer[0] = False
+
+        for empty in emptyRules:
+            newEmpty = self.findRule(empty, ruleTable)
+            updateEmptySet.update(newEmpty)
+        newlyReduced.update(updateEmptySet)
+
+        for empty1 in emptyRules:
+            for empty2 in emptyRules:
+                newEmpty = self.findRule(empty1 + empty2, ruleTable)
                 if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                    emptyChangedContainer[0] = True
                     updateEmptySet.update(newEmpty)
-            newlyReduced.update(updateEmptySet)
-
-            for empty1 in emptyRules:
-                for empty2 in emptyRules:
-                    newEmpty = self.findRule(empty1 + empty2, ruleTable)
-                    if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                        emptyChangedContainer[0] = True
-                        updateEmptySet.update(newEmpty)
-            newlyReduced.update(updateEmptySet)
-
+        newlyReduced.update(updateEmptySet)
         return newlyReduced
 
 
@@ -59,9 +58,9 @@ class ET0LParserCYK:
                         return False
         return True
 
-    def findInHistory(self, table, tableHistory):
-        for t in tableHistory:
-            if self.compareTables(table, t):
+    def findInHistory(self, table, emptySet, tableHistory):
+        for x in tableHistory:
+            if self.compareTables(table, x[0]) and x[1] == emptySet:
                 return True
         return False
 
@@ -138,43 +137,55 @@ class ET0LParserCYK:
         for diag, character in enumerate(self.word):
             table[diag][diag] = self.findRule(character, rules)
         
-    def CYK_loop(self, CYKtable, ruleTable, modified, tableHistory, emptyRules, emptyModified):
-        emptyModifiedContainer = [emptyModified]
-        emptyRules = emptyRules | self.fillEmptyRules(emptyRules, ruleTable, emptyModifiedContainer)
-        currentHistory = copy.deepcopy(tableHistory)
-        newCYKtable = copy.deepcopy(self.emptyTable)
+    def addToStacks(self, CYKtable, ruleTable, modified, tableHistory, emptyRules, emptyModified):
+        self.CYKtableStack.append(CYKtable)
+        self.ruleTableStack.append(ruleTable)
+        self.modifiedStack.append(modified)
+        self.tableHistoryStack.append(tableHistory)
+        self.emptyRulesStack.append(emptyRules)
+        self.emptyModifiedStack.append(emptyModified)
 
-        modifiedContainer = [modified]
-        # self.printTable(CYKtable)
-        for idr, row in enumerate(CYKtable):
-            for idc, tableRules in enumerate(row):
-                if(tableRules is ''):
-                    continue
-                for nonTerminal in tableRules:
-                    self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
+    def CYK_loop(self):
 
-        if self.findInHistory(newCYKtable, currentHistory) and emptyModified == False:
-            # print("Loop detected")
-            return False
-        currentHistory.append(CYKtable)
+        while self.CYKtableStack.__len__() != 0:
+            CYKtable = self.CYKtableStack.pop(0)
+            ruleTable = self.ruleTableStack.pop(0)
+            modified = self.modifiedStack.pop(0)
+            tableHistory = self.tableHistoryStack.pop(0)
+            emptyRules = self.emptyRulesStack.pop(0)
+            emptyModified = self.emptyModifiedStack.pop(0)
 
-        if "S" in newCYKtable[0][self.word.__len__()-1]:
-            # self.printTable(newCYKtable)
-            for x in currentHistory:
-                self.printTable(x)
-            self.printTable(newCYKtable)
-            return True
+            emptyModifiedContainer = [emptyModified]
+            currentHistory = copy.deepcopy(tableHistory)
+            newCYKtable = copy.deepcopy(self.emptyTable)
+
+            modifiedContainer = [modified]
+            #self.printTable(CYKtable)
+            #print(emptyRules)
+            for idr, row in enumerate(CYKtable):
+                for idc, tableRules in enumerate(row):
+                    if(tableRules is ''):
+                        continue
+                    for nonTerminal in tableRules:
+                        self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
+
+            if self.findInHistory(newCYKtable, emptyRules, currentHistory) == True:
+                continue
+            currentHistory.append((newCYKtable, emptyRules))
+            emptyRules = self.fillEmptyRules(emptyRules, ruleTable)
+
+            if "S" in newCYKtable[0][self.word.__len__()-1]:
+                # self.printTable(newCYKtable)
+                for x in currentHistory:
+                    self.printTable(x[0])
+                    print(x[1])
+                return True
+            
+            if modifiedContainer[0]:
+                for rulesTable in self.rules:
+                    self.addToStacks(newCYKtable, rulesTable, False, currentHistory, emptyRules, emptyModifiedContainer[0])
         
-        if modifiedContainer[0]:
-            for rulesTable in self.rules:
-                if rulesTable == ruleTable:
-                    tempEmpty = emptyRules
-                    tempModif = emptyModifiedContainer[0]
-                else:
-                    tempEmpty = set()
-                    tempModif = True
-                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, tempEmpty, tempModif):
-                    return True
+        return False
 
     def parse(self, word):
         self.word = word
@@ -182,11 +193,12 @@ class ET0LParserCYK:
         for rulesTable in self.rules:
             table = copy.deepcopy(self.emptyTable)
             self.fillStart(table, rulesTable)
-            tableHistory = []
+            tableHistory = [(table, self.fillEmptyRules({}, rulesTable))]
             # This will start first step, need to use all tables again
             for rulesTable2 in self.rules:
-                if self.CYK_loop(table, rulesTable2, False, tableHistory, set(), True):
-                    return True
+                self.addToStacks(table, rulesTable2, False, tableHistory, set(), True)
+        if self.CYK_loop():
+            return True
         return False
 
-print(ET0LParserCYK("testRulesET0L.txt").parse("cbaa"))
+print(ET0LParserCYK("testRulesET0L.txt").parse("bcbc"))

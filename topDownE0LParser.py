@@ -37,30 +37,29 @@ class TopDownE0LParser:
         self.mustChangeStack.append(False)
 
         while self.wordStack.__len__() != 0:
-            word = self.wordStack.pop()
-            index = self.indexStack.pop()
-            historyWords = self.historyStack.pop()
-            mustChange = self.mustChangeStack.pop()
+            word = self.wordStack.pop(0)
+            index = self.indexStack.pop(0)
+            historyWords = self.historyStack.pop(0)
+            mustChange = self.mustChangeStack.pop(0)
+
+            if index == 0:
+                word = word.replace("-", "")
 
             if word in historyWords and index == 0 and not mustChange:
                 continue
             if index > word.__len__():
                 continue
-            if word.__len__() > length:
+            if word.replace("-", "").__len__() > length:
                 continue
             if index == 0 and word.islower() and not mustChange:
                 if parseWord != None and word == parseWord:
                     return True
                 self.generatedWords.add(word)
 
-
-            if self.rules.get(word[index], []) == []:
+            ruleFound = self.rules.get(word[index], [])
+            if ruleFound != []:
                 # No rule found, throw away word
-                continue
-            else:
-                for rule in self.rules.get(word[index], []):
-                    if rule == "-":
-                        rule = ""
+                for rule in ruleFound:
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     self.wordStack.append(newWord)
                     self.indexStack.append((index + rule.__len__()) % newWord.__len__())
@@ -101,4 +100,6 @@ class TopDownE0LParser:
             return True
         return False
 
-# print(TopDownE0LParser("testRules.txt").generate(4))
+topDownE0LParser = TopDownE0LParser("newTestRules.txt")
+E0LWordsGenerated = topDownE0LParser.generateValidWords(5, startWord="S")
+print(E0LWordsGenerated)
