@@ -46,6 +46,12 @@ class TopDownET0LParser:
             historyWords = self.historyStack.pop()
             mustChange = self.mustChangeStack.pop()
 
+            if index == 0:
+                word = word.replace("-", "")
+
+            if word.__len__() == 0:
+                continue
+
             # index that is too big
             if index > word.__len__():
                 continue
@@ -57,7 +63,6 @@ class TopDownET0LParser:
                 if parseWord != None and word == parseWord:
                     return True
                 self.results.add(word)
-                continue
             if word in historyWords and index == 0 and not mustChange:
                 continue
             if ruleSet.get(word[index], []) == []:
@@ -65,9 +70,9 @@ class TopDownET0LParser:
                 continue
             else:
                 for rule in ruleSet.get(word[index], []):
-                    if rule == "-":
-                        rule = ""
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
+                    if newWord.__len__() == 0:
+                        continue
                     if (index + rule.__len__()) % newWord.__len__() == 0:
                         for x in self.rules:
                             self.wordStack.append(newWord)
@@ -76,7 +81,7 @@ class TopDownET0LParser:
                             if index == 0 and not mustChange:
                                 historyWords.add(word)
                             self.historyStack.append(historyWords.copy())
-                            self.mustChangeStack.append(rule == "")
+                            self.mustChangeStack.append(rule == "-")
 
                     else: 
                         self.wordStack.append(newWord)
@@ -85,7 +90,7 @@ class TopDownET0LParser:
                         if index == 0 and not mustChange:
                             historyWords.add(word)
                         self.historyStack.append(historyWords.copy())
-                        self.mustChangeStack.append(rule == "")
+                        self.mustChangeStack.append(rule == "-")
 
     def getAllTerminals(self, ruleSet):
         terminals = set()
@@ -119,5 +124,5 @@ class TopDownET0LParser:
             return True
         return False
 
-# print(TopDownET0LParser("demoET0L.txt").generate(10, startWord="S"))
+print(TopDownET0LParser("testRulesET0L.txt").generateValidWords(5, startWord="S"))
 # print(TopDownET0LParser("demoET0L.txt").parse("aaaaaaaa", startWord="S"))

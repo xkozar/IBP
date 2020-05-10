@@ -167,7 +167,13 @@ class ET0LParserCYK:
         
         if modifiedContainer[0]:
             for rulesTable in self.rules:
-                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, emptyRules, emptyModifiedContainer[0]):
+                if rulesTable == ruleTable:
+                    tempEmpty = emptyRules
+                    tempModif = emptyModifiedContainer[0]
+                else:
+                    tempEmpty = set()
+                    tempModif = True
+                if self.CYK_loop(newCYKtable, rulesTable, False, currentHistory, tempEmpty, tempModif):
                     return True
 
     def parse(self, word):
@@ -183,4 +189,4 @@ class ET0LParserCYK:
                     return True
         return False
 
-# print(ET0LParserCYK("testRulesET0L.txt").parse("bca"))
+print(ET0LParserCYK("testRulesET0L.txt").parse("cbaa"))

@@ -52,7 +52,7 @@ class TopDownE0LParser:
                 if parseWord != None and word == parseWord:
                     return True
                 self.generatedWords.add(word)
-                continue
+
 
             if self.rules.get(word[index], []) == []:
                 # No rule found, throw away word
