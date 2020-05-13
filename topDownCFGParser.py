@@ -61,8 +61,8 @@ class TopDownCFGParser:
         self.generateWords("S", length)
         return self.results
 
-    def parse(self, word):
-        if self.generateWords("S", word.__len__(), word) == True:
+    def parse(self, word, startWord="S"):
+        if self.generateWords(startWord, word.__len__(), word) == True:
             return True
         return False
 

@@ -201,4 +201,4 @@ class ET0LParserCYK:
             return True
         return False
 
-print(ET0LParserCYK("testRulesET0L.txt").parse("bcbc"))
+# print(ET0LParserCYK("testRulesET0L.txt").parse("bcbc"))

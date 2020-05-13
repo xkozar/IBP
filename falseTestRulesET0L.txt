@@ -2,11 +2,7 @@ S -> AB
 A -> A
 B -> BC
 C -> BC
-A -> XY
 C -> A
-X -> Z
-Y -> -
-Z -> -
 
 #
 

@@ -5,8 +5,8 @@
 import getopt
 import sys
 from parserCFG import CFGParserCYK
-from parserE0Lnew import E0LParserCYK
-from parserET0Lnew import ET0LParserCYK
+from parserE0L import E0LParserCYK
+from parserET0L import ET0LParserCYK
 from topDownCFGParser import TopDownCFGParser
 from topDownE0LParser import TopDownE0LParser
 from topDownET0LParser import TopDownET0LParser
@@ -37,11 +37,13 @@ wordToParseFlag = "-w"
 rulesForParserFlag = "-r"
 
 topDownParserFlag = "--top-down"
+startWordFlag = "--start-word"
+axiom = "S"
 
 parserOptions = [CFGParserFlag, E0LParserFlag, ET0LParserFlag]
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "CETr:w:h", ["top-down"])
+    opts, args = getopt.getopt(sys.argv[1:], "CETr:w:h", ["top-down", "start-word="])
 except getopt.GetoptError as err:
     print("Incorrect use of commands", file=sys.stderr)
     print(err, file=sys.stderr)
@@ -76,44 +78,47 @@ rulesFile = [item for item in opts if item[0] == rulesForParserFlag][0][1]
 
 useTopDownParser = topDownParserFlag in dict(opts)
 
+if startWordFlag in dict(opts):
+    print(dict(opts)[startWordFlag])
+
 # Run specified parser
 for flag, value in opts:
     if flag == CFGParserFlag:
         if useTopDownParser:
             print("Using context free grammar parser (Top-Down)")
-            if TopDownCFGParser(rulesFile).parse(word):
+            if TopDownCFGParser(rulesFile).parse(word, startWord=axiom):
                 print("Success")
             else:
                 print("Fail")
         else:
             print("Using context free grammar parser (Cocke-Younger-Kasami)")
-            if CFGParserCYK(word, rulesFile).parse():
+            if CFGParserCYK(rulesFile).parse(word):
                 print("Success")
             else:
                 print("Fail")
     if flag == E0LParserFlag:
         if useTopDownParser:
             print("Using E0L parser (Top-Down)")
-            if TopDownCFGParser(rulesFile).parse(word):
+            if TopDownCFGParser(rulesFile).parse(word, startWord=axiom):
                 print("Success")
             else:
                 print("Fail")
         else:
             print("Using E0L parser (Cocke-Younger-Kasami)")
-            if E0LParserCYK(word, rulesFile).parse():
+            if E0LParserCYK(rulesFile).parse(word):
                 print("Success")
             else:
                 print("Fail")
     if flag == ET0LParserFlag:
         if useTopDownParser:
             print("Using ET0L parser (Top-Down)")
-            if TopDownCFGParser(rulesFile).parse(word):
+            if TopDownCFGParser(rulesFile).parse(word, startWord=axiom):
                 print("Success")
             else:
                 print("Fail")
         else:
             print("Using ET0L parser (Cocke-Younger-Kasami)")
-            if ET0LParserCYK(word, rulesFile).parse():
+            if ET0LParserCYK(rulesFile).parse(word):
                 print("Success")
             else:
                 print("Fail")

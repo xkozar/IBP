@@ -2,17 +2,14 @@ S -> AB
 A -> A
 B -> BC
 C -> BC
-A -> XY
 C -> A
+A -> XY
 X -> Z
 Y -> -
 Z -> -
 
-#
-
-a -> A
+a -> B
 c -> B
-b -> C
 
 A -> a
 B -> b

@@ -100,6 +100,6 @@ class TopDownE0LParser:
             return True
         return False
 
-topDownE0LParser = TopDownE0LParser("newTestRules.txt")
-E0LWordsGenerated = topDownE0LParser.generateValidWords(5, startWord="S")
-print(E0LWordsGenerated)
+#topDownE0LParser = TopDownE0LParser("newTestRules.txt")
+#E0LWordsGenerated = topDownE0LParser.generateValidWords(5, startWord="S")
+#print(E0LWordsGenerated)
