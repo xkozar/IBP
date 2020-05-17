@@ -19,7 +19,7 @@ class CFGParserCYK:
         self.modified = True # Determines whether rules table was modified
         self.table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
 
-    
+    # Formats CYK table nicely
     def printTable(self):
         temp = self.table.copy()
         temp.reverse()
@@ -46,6 +46,7 @@ class CFGParserCYK:
             if x == row.__len__() - 1:
                 print(rowToPrint.__len__() * "_")
 
+    # Find all symbols that can be rewriten to passed argument
     def findRule(self, rightSide):
         result = ''
         for leftSide in self.rules:
@@ -54,10 +55,13 @@ class CFGParserCYK:
         
         return(result)
 
-    def findPairForRule(self, row, column, nTerminal):
+    # Does reduction of rules for symbol on [row, col] position
+    def reduceRules(self, row, column, nTerminal):
+        # Invalid column
         if column == self.word.__len__()-1:
             return
 
+        # Reduce normal pairs
         for col, tRules in enumerate(self.table[column+1]):
             if tRules == '':
                 continue
@@ -70,22 +74,27 @@ class CFGParserCYK:
                         self.table[row][col].add(character)
                         self.modified = True
 
+    # Runs CYK algorithm for word
     def parse(self, word):
         self.word = word
         self.initializeBeginState()
+        # Fill diagonal with non terminals
         for i in range(self.word.__len__()):
             for lSide in self.rules:
                 if self.word[i] in self.rules[lSide]:
                     self.table[i][i].add(lSide)
 
+        # Loop through table
         while self.modified:
             self.modified = False
             self.printTable()
             for idr, row in enumerate(self.table):
                 for idc, tableRules in enumerate(row):
-                    if(tableRules is not ''):
-                        for nonTerminal in tableRules:
-                            self.findPairForRule(idr, idc, nonTerminal)
+                    # Empty or invalid position
+                    if(tableRules is '' or idc < idr):
+                        continue
+                    for nonTerminal in tableRules:
+                        self.reduceRules(idr, idc, nonTerminal)
 
         # self.printTable()
         if "S" in self.table[0][self.word.__len__()-1]:

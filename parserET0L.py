@@ -178,8 +178,8 @@ class ET0LParserCYK:
             # Loop through table
             for idr, row in enumerate(CYKtable):
                 for idc, tableRules in enumerate(row):
-                    # Empty position
-                    if(tableRules is ''):
+                    # Empty or invalid position
+                    if(tableRules is '' or idc < idr):
                         continue
                     # Do reduction for each symbol on position
                     for nonTerminal in tableRules:
