@@ -14,6 +14,7 @@ class ET0LParserCYK:
         self.rules = self.reader.contentToRules(True)
         self.initTables()
 
+    # Reset all variables that could be modified when parse was lastly run
     def initTables(self):
         self.emptyTable = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
@@ -27,27 +28,28 @@ class ET0LParserCYK:
 
     def fillEmptyRules(self, emptyRules, ruleTable):
         newlyReduced = set()
-
         updateEmptySet = set()
 
+        # Direct deletion
         updateEmptySet.update(self.findRule("-", ruleTable))
-        # if newlyReduced.__len__() == 0:
-        #     emptyChangedContainer[0] = False
 
+        # Unary rules that can lead to deletion
         for empty in emptyRules:
             newEmpty = self.findRule(empty, ruleTable)
             updateEmptySet.update(newEmpty)
         newlyReduced.update(updateEmptySet)
 
+        # Pairs that can lead to deletion
         for empty1 in emptyRules:
             for empty2 in emptyRules:
                 newEmpty = self.findRule(empty1 + empty2, ruleTable)
                 if emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
                     updateEmptySet.update(newEmpty)
         newlyReduced.update(updateEmptySet)
+
         return newlyReduced
 
-
+    # Compare CYK tables
     def compareTables(self, tab1, tab2):
         for row1, row2 in zip(tab1, tab2):
             for cell1, cell2 in zip(row1, row2):
@@ -58,16 +60,19 @@ class ET0LParserCYK:
                         return False
         return True
 
+    # Returns whether new table already existed. Used for loop detection
     def findInHistory(self, table, emptySet, tableHistory):
         for x in tableHistory:
             if self.compareTables(table, x[0]) and x[1] == emptySet:
                 return True
         return False
 
+    # Formats CYK table nicely
     def printTable(self, tab):
         temp = tab.copy()
         temp.reverse()
         
+        # Contains max width of individual columns
         sizeTemplate = []
         for col in zip(*temp):
             sizeTemplate.append(max(col, key=len).__len__())
@@ -90,6 +95,7 @@ class ET0LParserCYK:
             if x == row.__len__() - 1:
                 print(rowToPrint.__len__() * "_")
 
+    # Find all symbols that can be rewriten to passed argument
     def findRule(self, rightSide, rules):
         result = set()
         for leftSide in rules:
@@ -97,6 +103,7 @@ class ET0LParserCYK:
                 result.add(leftSide)
         return result
 
+    # Does reduction of rules for symbol on [row, col] position
     def reduceRules(self, row, column, nTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules):
         if nTerminal == "":
             return
@@ -119,6 +126,8 @@ class ET0LParserCYK:
                         modifiedContainer[0] = True
                         newCYKtable[row][column].update(rule)
 
+        # This column cannot be reduced using pairs,
+        # since it looks for row = column + 1 and that is out of bounds
         if column == self.word.__len__()-1:
             return
 
@@ -133,10 +142,12 @@ class ET0LParserCYK:
                     newCYKtable[row][col].add(character)
                     modifiedContainer[0] = True
 
+    # Fill diagonal with symbols
     def fillStart(self, table, rules):
         for diag, character in enumerate(self.word):
             table[diag][diag] = self.findRule(character, rules)
-        
+    
+    # Adds values to top of stacks
     def addToStacks(self, CYKtable, ruleTable, modified, tableHistory, emptyRules, emptyModified):
         self.CYKtableStack.append(CYKtable)
         self.ruleTableStack.append(ruleTable)
@@ -145,9 +156,11 @@ class ET0LParserCYK:
         self.emptyRulesStack.append(emptyRules)
         self.emptyModifiedStack.append(emptyModified)
 
+    # Step of modified CYK algorithm for ET0L systems
     def CYK_loop(self):
 
         while self.CYKtableStack.__len__() != 0:
+            # Program is faster when values are taken from bottom of stacks
             CYKtable = self.CYKtableStack.pop(0)
             ruleTable = self.ruleTableStack.pop(0)
             modified = self.modifiedStack.pop(0)
@@ -160,20 +173,24 @@ class ET0LParserCYK:
             newCYKtable = copy.deepcopy(self.emptyTable)
 
             modifiedContainer = [modified]
-            #self.printTable(CYKtable)
-            #print(emptyRules)
+            emptyRules = self.fillEmptyRules(emptyRules, ruleTable)
+
+            # Loop through table
             for idr, row in enumerate(CYKtable):
                 for idc, tableRules in enumerate(row):
+                    # Empty position
                     if(tableRules is ''):
                         continue
+                    # Do reduction for each symbol on position
                     for nonTerminal in tableRules:
                         self.reduceRules(idr, idc, nonTerminal, ruleTable, CYKtable, newCYKtable, modifiedContainer, emptyRules)
 
+            # Check for loop
             if self.findInHistory(newCYKtable, emptyRules, currentHistory) == True:
                 continue
             currentHistory.append((newCYKtable, emptyRules))
-            emptyRules = self.fillEmptyRules(emptyRules, ruleTable)
 
+            # Check result
             if "S" in newCYKtable[0][self.word.__len__()-1]:
                 # self.printTable(newCYKtable)
                 for x in currentHistory:
@@ -181,12 +198,15 @@ class ET0LParserCYK:
                     print(x[1])
                 return True
             
+            # Unique reduction was made
             if modifiedContainer[0]:
                 for rulesTable in self.rules:
+                    # This means recursion, but it is rewritten to iteration
                     self.addToStacks(newCYKtable, rulesTable, False, currentHistory, emptyRules, emptyModifiedContainer[0])
         
         return False
 
+    # Runs modified CYK algorithm for word
     def parse(self, word):
         self.word = word
         self.initTables()

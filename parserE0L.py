@@ -14,50 +14,42 @@ class E0LParserCYK:
         self.rules = self.reader.contentToRules(True)
         self.modified = True # Determines whether rules table was modified
         self.tableHistory = []
-        self.emptyRules = set()
-        self.emptyRulesModified = True
+        self.emptySet = set()
         self.initTables()
         
-
+    # Reset all variables that could be modified when parse was lastly run
     def initTables(self):
         self.modified = True # Determines whether rules table was modified
         self.table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         self.tableHistory = []
-        self.emptyRules = set()
-        self.emptyRulesModified = True
+        self.emptySet = set()
 
-        
-
+    # Fill set of empty symbols that can be used during reduction of rules
     def fillEmptyRules(self):
-        if self.emptyRules.__len__() == 0:
-            self.emptyRules = self.findRule("-")
-            if self.emptyRules.__len__() == 0:
-                self.emptyRulesModified = False
-            return
-
         newlyReduced = set()
+        updateEmptySet = set()
 
-        if self.emptyRulesModified:
-            self.emptyRulesModified = False
-            updateEmptySet = set()
-            for empty in self.emptyRules:
-                newEmpty = self.findRule(empty)
-                if self.emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                    self.emptyRulesModified = True
+        # Direct deletion
+        updateEmptySet.update(self.findRule("-"))
+
+        # Unary rules that can lead to deletion
+        for empty in self.emptySet:
+            newEmpty = self.findRule(empty)
+            updateEmptySet.update(newEmpty)
+        newlyReduced.update(updateEmptySet)
+
+        # Pairs that can lead to deletion
+        for empty1 in self.emptySet:
+            for empty2 in self.emptySet:
+                newEmpty = self.findRule(empty1 + empty2)
+                if self.emptySet.intersection(newEmpty).__len__() < newEmpty.__len__():
                     updateEmptySet.update(newEmpty)
-            newlyReduced.update(updateEmptySet)
+        newlyReduced.update(updateEmptySet)
 
-            for empty1 in self.emptyRules:
-                for empty2 in self.emptyRules:
-                    newEmpty = self.findRule(empty1 + empty2)
-                    if self.emptyRules.intersection(newEmpty).__len__() < newEmpty.__len__():
-                        self.emptyRulesModified = True
-                        updateEmptySet.update(newEmpty)
-            newlyReduced.update(updateEmptySet)
+        self.emptySet = newlyReduced.copy()
 
-            self.emptyRules.update(newlyReduced)
-
+    # Compare CYK tables
     def compareTables(self, tab1, tab2):
         for row1, row2 in zip(tab1, tab2):
             for cell1, cell2 in zip(row1, row2):
@@ -68,16 +60,19 @@ class E0LParserCYK:
                         return False
         return True
 
-    def findInHistory(self, table):
-        for t in self.tableHistory:
-            if self.compareTables(table, t):
+    # Returns whether new table already existed. Used for loop detection
+    def findInHistory(self):
+        for x in self.tableHistory:
+            if self.compareTables(self.new_table, x[0]) and x[1] == self.emptySet:
                 return True
         return False
 
+    # Formats CYK table nicely
     def printTable(self, tab):
         temp = tab.copy()
         temp.reverse()
         
+        # Contains max width of individual columns
         sizeTemplate = []
         for col in zip(*temp):
             sizeTemplate.append(max(col, key=len).__len__())
@@ -100,10 +95,12 @@ class E0LParserCYK:
             if x == row.__len__() - 1:
                 print(rowToPrint.__len__() * "_")
 
+    # Fill diagonal with symbols
     def fillStart(self, word, table):
         for diag, character in enumerate(self.word):
             table[diag][diag] = self.findRule(character)
 
+    # Find all symbols that can be rewriten to passed argument
     def findRule(self, rightSide):
         result = set()
         for leftSide in self.rules:
@@ -111,21 +108,22 @@ class E0LParserCYK:
                 result.add(leftSide)
         return result
 
-    def reduceRules(self, row, column, nTerminal):
-        if nTerminal == "":
+    # Does reduction of rules for symbol on [row, col] position
+    def reduceRules(self, row, column, symbol):
+        if symbol == "":
             return
         
         # Reduce unary rules
-        unaryRuleFound = self.findRule(nTerminal)
+        unaryRuleFound = self.findRule(symbol)
         for unaryRule in unaryRuleFound:
-            if nTerminal in self.table[row][column]:
+            if symbol in self.table[row][column]:
                 self.modified = True
                 self.new_table[row][column].update(unaryRule)
 
         # Reduce rules where 1 nonterminal can be erased
-        if nTerminal in self.table[row][column]:
-            for first in set(nTerminal) | self.emptyRules:
-                for second in set(nTerminal) | self.emptyRules:
+        if symbol in self.table[row][column]:
+            for first in set(symbol) | self.emptySet:
+                for second in set(symbol) | self.emptySet:
                     if first in self.table[row][column] or second in self.table[row][column]:
                         rule = self.findRule(first + second)
                         if rule.__len__() == 0:
@@ -133,7 +131,8 @@ class E0LParserCYK:
                         self.modified = True
                         self.new_table[row][column].update(rule)
 
-        # This column cannot be reduced using pairs, since it looks for row = column + 1 and that is out of bounds
+        # This column cannot be reduced using pairs,
+        # since it looks for row = column + 1 and that is out of bounds
         if column == self.word.__len__()-1:
             return
 
@@ -142,40 +141,46 @@ class E0LParserCYK:
             if tRules == '':
                 continue
             for nTerm in tRules:
-                result = self.findRule(nTerminal + nTerm)
+                result = self.findRule(symbol + nTerm)
                 for character in result:
                     self.new_table[row][col].add(character)
                     self.modified = True
 
+    # Runs modified CYK algorithm for word
     def parse(self, word): 
         self.word = word
         self.initTables()
         print("Word: " + self.word)
         self.fillStart(self.word, self.table)
 
+        # While we got some unique reduction
         while self.modified:
             self.fillEmptyRules()
             self.modified = False
             self.printTable(self.table)
             
+            # Loop through table
             for idr, row in enumerate(self.table):
                 for idc, tableRules in enumerate(row):
+                    # Empty or invalid position
                     if(tableRules is '' or idc < idr):
                         continue
+                    # Do reduction for each symbol on position
                     for nonTerminal in tableRules:
                         self.reduceRules(idr, idc, nonTerminal)
 
-            # Check is empty rules are still being processed
-            if self.findInHistory(self.new_table) and self.emptyRulesModified == False:
+            # Check for loop
+            if self.findInHistory():
                 print("Loop detected")
                 return False
-            self.tableHistory.append(self.new_table)
+            self.tableHistory.append((self.new_table, self.emptySet))
 
-
+            # Check result
             if "S" in self.new_table[0][self.word.__len__()-1]:
                 self.printTable(self.new_table)
                 return True
 
+            # Swap tables
             self.table = copy.deepcopy(self.new_table)
             self.new_table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
         return False
