@@ -12,13 +12,14 @@ class CFGParserCYK:
         self.word = ""
         self.reader = RuleReader(rules)
         self.rules = self.reader.contentToRules(True)
-        self.initTables()
+        self.initializeBeginState()
 
-    def initTables(self):
+    # Reset all variables that could be modified when parse was lastly run
+    def initializeBeginState(self):
         self.modified = True # Determines whether rules table was modified
         self.table = [[set() for i in range(self.word.__len__())] for j in range(self.word.__len__())]
 
-
+    
     def printTable(self):
         temp = self.table.copy()
         temp.reverse()
@@ -71,7 +72,7 @@ class CFGParserCYK:
 
     def parse(self, word):
         self.word = word
-        self.initTables()
+        self.initializeBeginState()
         for i in range(self.word.__len__()):
             for lSide in self.rules:
                 if self.word[i] in self.rules[lSide]:
