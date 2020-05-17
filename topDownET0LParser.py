@@ -19,18 +19,14 @@ class TopDownET0LParser:
         self.historyStack = []
         self.mustChangeStack = []
 
+    # Prints all generated valid words
     def printResults(self):
         temp = list(self.results)
         temp.sort()
         for x in temp:
             print(x)
 
-    def possibleRuleApplication(self, word, ruleSet):
-        for x in word:
-            if ruleSet.get(x, []) != []:
-                return True
-        return False
-
+    # Generates all possible words of max length
     def generateWords(self, length, startWord="S", parseWord = None):
         for x in self.rules:
             self.wordStack.append(startWord)
@@ -46,29 +42,33 @@ class TopDownET0LParser:
             historyWords = self.historyStack.pop(0)
             mustChange = self.mustChangeStack.pop(0)
 
+            # '-' that represents epsilon can only be deleted
+            # on start of derivation step
             if index == 0:
                 word = word.replace("-", "")
 
+            # Empty word
             if word.__len__() == 0:
                 continue
-
-            # index that is too big
+            # Index that is too big
             if index > word.__len__():
                 continue
-            # word that is too long
+            # Word that is too long
             if word.replace("-", "").__len__() > length:
                 continue
-            # word of right size and is generated in paralel
+            # Word of right size and is generated in paralel
             if index == 0 and word.islower() and not mustChange:
                 if parseWord != None and word == parseWord:
                     return True
                 self.results.add(word)
+            # Loop detection
             if word in historyWords and index == 0 and not mustChange:
                 continue
             if ruleSet.get(word[index], []) == []:
                 # No rule, throw away
                 continue
             else:
+                # Rule application
                 for rule in ruleSet.get(word[index], []):
                     newWord = word[0:index] + rule + word[index+1:word.__len__()]
                     if newWord.__len__() == 0:
@@ -92,6 +92,7 @@ class TopDownET0LParser:
                         self.historyStack.append(historyWords.copy())
                         self.mustChangeStack.append(rule == "-")
 
+    # Returns set of all terminals from rules
     def getAllTerminals(self, ruleSet):
         terminals = set()
 
@@ -103,6 +104,7 @@ class TopDownET0LParser:
                     terminals.add(symbol)
         return terminals
 
+    # Returns all combinations of terminals of some length
     def generateAllCombinations(self, length):
         terminals = set()
         for ruleSet in self.rules:    
@@ -115,14 +117,13 @@ class TopDownET0LParser:
 
         return result
 
+    # Returns all valid words of max length
     def generateValidWords(self, length, startWord="S"):
         self.generateWords(length, startWord=startWord)
         return self.results
 
+    # Parse word
     def parse(self, word, startWord="S"):
         if self.generateWords(word.__len__(), word, startWord) == True:
             return True
         return False
-
-# print(TopDownET0LParser("testRulesET0L.txt").generateValidWords(5, startWord="S"))
-# print(TopDownET0LParser("demoET0L.txt").parse("aaaaaaaa", startWord="S"))

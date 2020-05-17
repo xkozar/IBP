@@ -14,28 +14,35 @@ class TopDownCFGParser:
         self.results = set()
         self.newWordStack = []
 
+    # Prints all generated valid words
     def printResults(self):
         for x in self.results:
             print(x)
 
+    # Generates all possible words of max length
     def generateWords(self, startWord, length, parseWord = None):
         self.newWordStack.append(startWord)
 
         while self.newWordStack.__len__() > 0:
             word = self.newWordStack.pop(0)
+            # Generated word too long
             if(word.__len__() > length):
                 continue
+            # Generated word is valid
             if(word.islower()):
+                # If function is in parse mode
                 if parseWord != None and word == parseWord:
                     return True
                 self.results.add(word)
                 continue
+            # Apply rule to each symbol
             for letterIndex in range(word.__len__()):
                 for rule in self.rules.get(word[letterIndex], []):
                     newWord = word[0:letterIndex] + rule + word[letterIndex+1:word.__len__()]
                     if newWord not in self.newWordStack:
                         self.newWordStack.append(newWord)
 
+    # Returns set of all terminals from rules
     def getAllTerminals(self):
         terminals = set()
 
@@ -47,6 +54,7 @@ class TopDownCFGParser:
                     terminals.add(symbol)
         return terminals
 
+    # Returns all combinations of terminals of some length
     def generateAllCombinations(self, length):
         terminals = self.getAllTerminals()
 
@@ -57,10 +65,12 @@ class TopDownCFGParser:
 
         return result
 
+    # Returns all valid words of max length
     def generateValidWords(self, length):
         self.generateWords("S", length)
         return self.results
 
+    # Parse word
     def parse(self, word, startWord="S"):
         if self.generateWords(startWord, word.__len__(), word) == True:
             return True
