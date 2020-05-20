@@ -17,10 +17,15 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
+testRulesCFG = "test-rules/testRulesCFG.txt"
+testRulesE0L = "test-rules/testRulesE0L.txt"
+testRulesET0L = "test-rules/testRulesET0L.txt"
+falseTestRulesET0L = "test-rules/falseTestRulesET0L.txt"
+
 startTime = time.perf_counter()
 print("Starting tests. This might take a while")
-parserCFGCYK = CFGParserCYK("testRulesCFG.txt")
-topDownCFGParser = TopDownCFGParser("testRulesCFG.txt")
+parserCFGCYK = CFGParserCYK(testRulesCFG)
+topDownCFGParser = TopDownCFGParser(testRulesCFG)
 CFGWordsGenerated = topDownCFGParser.generateValidWords(5)
 CFGFalseWords = topDownCFGParser.generateAllCombinations(5) - CFGWordsGenerated
 CFGCounter = 0
@@ -46,8 +51,8 @@ for word in CFGFalseWords:
         print("CFG parser should fail on: ", word)
 
 
-parserE0LCYK = E0LParserCYK("testRulesE0L.txt")
-topDownE0LParser = TopDownE0LParser("testRulesE0L.txt")
+parserE0LCYK = E0LParserCYK(testRulesE0L)
+topDownE0LParser = TopDownE0LParser(testRulesE0L)
 E0LWordsGenerated = topDownE0LParser.generateValidWords(5, startWord="S")
 E0LFalseWords = topDownE0LParser.generateAllCombinations(5) - E0LWordsGenerated
 E0LCounter = 0
@@ -73,8 +78,8 @@ for word in E0LFalseWords:
         enablePrint()
         print("E0L parser should fail on: ", word)
 
-parserET0LCYK = ET0LParserCYK("testRulesET0L.txt")
-topDownET0LParser = TopDownET0LParser("testRulesET0L.txt")
+parserET0LCYK = ET0LParserCYK(testRulesET0L)
+topDownET0LParser = TopDownET0LParser(testRulesET0L)
 ET0LWordsGenerated = topDownET0LParser.generateValidWords(5, startWord="S")
 
 ET0LCounter = 0
@@ -92,8 +97,8 @@ for word in ET0LWordsGenerated:
         print("ET0L parser failed on: ", word)
 
 
-parserET0LCYK = ET0LParserCYK("falseTestRulesET0L.txt")
-topDownET0LParser = TopDownET0LParser("falseTestRulesET0L.txt")
+parserET0LCYK = ET0LParserCYK(falseTestRulesET0L)
+topDownET0LParser = TopDownET0LParser(falseTestRulesET0L)
 
 ET0LFalseWords = topDownET0LParser.generateAllCombinations(5) - topDownET0LParser.generateValidWords(5, startWord="S")
 

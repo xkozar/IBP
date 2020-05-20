@@ -1,0 +1,16 @@
+S -> AB
+A -> A
+B -> BC
+C -> BC
+C -> A
+A -> XY
+X -> Z
+Y -> -
+Z -> -
+
+a -> B
+c -> B
+
+A -> a
+B -> b
+C -> c

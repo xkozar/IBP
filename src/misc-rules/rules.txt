@@ -1,0 +1,9 @@
+S -> AB
+A -> CD
+B -> EF
+C -> c
+D -> d
+E -> GH
+F -> f
+G -> g
+H -> h

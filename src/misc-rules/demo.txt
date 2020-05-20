@@ -1,6 +1,5 @@
 S -> AB
-A -> a
-A -> AB
+A -> BC
 B -> BC
 B -> b
 C -> c
