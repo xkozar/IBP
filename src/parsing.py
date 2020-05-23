@@ -18,7 +18,7 @@ def printHelp():
     print("-C -> use parser for context free grammar")
     print("-E -> use parser for E0L system")
     print("-T -> use parser for ET0L system")
-    print("Exactly 1 command above have to be used.")
+    print("Exactly 1 command above has to be used.")
     print("-w <word> -> specifies word to be parsed !MANDATORY!")
     print("-r <rules> -> specifies file with rules for parser !MANDATORY!")
     print("")
