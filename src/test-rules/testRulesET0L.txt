@@ -7,13 +7,10 @@ C -> A
 X -> Z
 Y -> -
 Z -> -
-
 #
-
 a -> A
 c -> B
 b -> C
-
 A -> a
 B -> b
 C -> c
