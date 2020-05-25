@@ -1,8 +1,0 @@
-A -> a
-B -> b
-C -> c
-#
-S -> AB
-A -> BC
-B -> BC
-C -> BC
