@@ -56,5 +56,12 @@ python parserTest.py
 
 Execution of tests might be slow!
 
+## Examples
+```
+python parsing.py -C --top-down --start-word BC -r ./test-rules/testRulesCFG.txt -w bcbc
+python parsing.py -E -r ./test-rules/testRulesE0L.txt -w bcbc
+python parsing.py -T -r ./test-rules/testRulesET0L.txt -w bcbc
+```
+
 #### Author
 Author of these source codes and thesis is Tomáš Kožár. This thesis was done under supervision of prof.RNDr. Alexander Meduna,CSc.

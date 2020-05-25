@@ -192,10 +192,8 @@ class ET0LParserCYK:
 
             # Check result
             if "S" in newCYKtable[0][self.word.__len__()-1]:
-                # self.printTable(newCYKtable)
                 for x in currentHistory:
                     self.printTable(x[0])
-                    print(x[1])
                 return True
             
             # Unique reduction was made

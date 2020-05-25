@@ -79,7 +79,7 @@ rulesFile = [item for item in opts if item[0] == rulesForParserFlag][0][1]
 useTopDownParser = topDownParserFlag in dict(opts)
 
 if startWordFlag in dict(opts):
-    print(dict(opts)[startWordFlag])
+    axiom = dict(opts)[startWordFlag]
 
 # Run specified parser
 for flag, value in opts:
