@@ -1,0 +1,72 @@
+
+\chapter{Definície prepisovacích pravidiel použité pre testovanie}
+\subsubsection*{Prepisovacie pravidlá pre bezkontextové gramatiky}
+
+\begin{verbatim}
+S -> AB
+A -> a
+A -> BC
+B -> BC
+B -> b
+C -> c
+C -> BC
+A -> g
+A -> b
+B -> c
+C -> b
+\end{verbatim}
+
+\subsubsection*{Prepisovacie pravidlá pre E0L systémy}
+\begin{verbatim}
+S -> AB
+A -> A
+B -> BC
+C -> BC
+C -> A
+A -> XY
+X -> Z
+Y -> -
+Z -> -
+a -> B
+c -> B
+A -> a
+B -> b
+C -> c
+\end{verbatim}
+
+\subsubsection*{Prepisovacie pravidlá pre platné slová ET0L systémov}
+\begin{verbatim}
+S -> AB
+A -> A
+B -> BC
+C -> BC
+A -> XY
+C -> A
+X -> Z
+Y -> -
+Z -> -
+#
+a -> A
+c -> B
+b -> C
+A -> a
+B -> b
+C -> c
+\end{verbatim}
+
+\subsubsection*{Prepisovacie pravidlá pre neplatné slová ET0L systémov}
+
+\begin{verbatim}
+S -> AB
+A -> A
+B -> BC
+C -> BC
+C -> A
+#
+a -> A
+c -> B
+b -> C
+A -> a
+B -> b
+C -> c
+\end{verbatim}
